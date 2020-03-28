@@ -64,6 +64,7 @@ long long MDST()
     e.push_back(r); //r = center edge of the diameter
     int u = r.first, v = r.second;
     for(int i = 1; i <= n; i++) D[i] = min(d[u][i], d[v][i]);
+    vis[u] = vis[v] = 1;
     dfs(u);
     dfs(v);
     return ans;

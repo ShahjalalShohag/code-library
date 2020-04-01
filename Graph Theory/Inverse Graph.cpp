@@ -9,17 +9,16 @@ int par[N], col[N], vis[N], ty[N], n;
 vector<int> g[N];
 int Find(int x)
 {
-    return par[x]==x?x:par[x]=Find(par[x]);
+    return par[x] == x ? x : par[x] = Find(par[x]);
 }
 void dfs(int u, int c)
 {
     if(vis[u]) return;
     vis[u] = 1;
-    par[u] = Find(u+1);
+    par[u] = Find(u + 1);
     col[u] = c;
     if(!ty[u]) for(auto v: g[u]) dfs(v, c ^ 1);
-    else
-    {
+    else{
         int v = 0;
         for(auto nw: g[u]){
             v = Find(v + 1);
@@ -32,7 +31,7 @@ void dfs(int u, int c)
 }
 int32_t main()
 {
-    int n; cin >> n;
+    cin >> n;
     for(int i = 1; i <= n; i++){
         char ch; cin >> ch;
         if(ch == 'N') ty[i] = 1; //'N' means these are the inverse edges

@@ -8,7 +8,7 @@ struct query
     int l, r, id;
     bool operator < (const query &x) const
     {
-        if(l / B == x.l / B) return (r < x.r) ^ (l / B & 1);
+        if(l / B == x.l / B) return r < x.r;
         return l / B < x.l / B;
     }
 }Q[N];

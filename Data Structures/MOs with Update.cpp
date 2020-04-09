@@ -78,3 +78,4 @@ int main()
     for (int i = 1; i <= nq; i++) cout << ans[i] << '\n';
     return 0;
 }
+//https://codeforces.com/contest/940/problem/F

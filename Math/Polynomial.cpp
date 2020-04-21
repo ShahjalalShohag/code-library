@@ -142,8 +142,11 @@ struct poly {
     int size() const { return (int)a.size(); }
     inline mint coef(const int i) const { return (i < a.size() && i >= 0) ? a[i]: mint(0); }
 	mint operator[](const int i) const { return (i < a.size() && i >= 0) ? a[i]: mint(0); } //Beware!! p[i] = k won't change the value of p.a[i]
-	bool is_zero() const {return a.empty();}
-    poly operator + (const poly &x) const {
+	bool is_zero() const {
+		for (int i = 0; i < size(); i++) if (a[i] != 0) return 0;
+		return 1;
+	}   
+	poly operator + (const poly &x) const {
         int n = max(size(), x.size());
         vector<mint> ans(n);
         for(int i = 0; i < n; i++) ans[i] = coef(i) + x.coef(i);
@@ -284,7 +287,11 @@ struct poly {
 		int i = leading_xk();
 		mint j = a[i];
 		poly t = div_xk(i) / j;
-		return (t.log(n) * mint(k)).exp(n).mul_xk(i * k).mod_xk(n) * (j.pow(k));
+		poly ans = (t.log(n) * mint(k)).exp(n);
+		if (1LL * i * k > n) ans = {0};
+		else ans = ans.mul_xk(i * k).mod_xk(n);
+		ans *= (j.pow(k));
+		return ans;
 	}
 	poly root(int n, int k = 2) const { //kth root of p(x) mod x^n
 		if(is_zero()) return *this;

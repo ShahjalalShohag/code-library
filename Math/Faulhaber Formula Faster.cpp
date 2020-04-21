@@ -439,3 +439,4 @@ int32_t main() {
     for (int i = 0; i <= k; i++) cout << ans[i] << ' ';
     return 0;
 }
+//https://www.codechef.com/problems/SERSUM

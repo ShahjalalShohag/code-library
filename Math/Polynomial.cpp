@@ -137,11 +137,11 @@ struct poly {
     inline void normalize() {
         while((int)a.size() && a.back() == 0) a.pop_back();
     }
-    template<class...Args> poly(Args...args): a(args...) { normalize(); }
-    poly(const initializer_list<mint> &x): a(x.begin(), x.end()) {normalize();}
+    template<class...Args> poly(Args...args): a(args...) { }
+    poly(const initializer_list<mint> &x): a(x.begin(), x.end()) { }
     int size() const { return (int)a.size(); }
-    inline mint coef(const int i)const { return (i < a.size() && i >= 0) ? a[i]: mint(0); }
-	mint operator[](const int i) { return (i < a.size() && i >= 0) ? a[i]: mint(0); } //Beware!! p[i] = k won't change the value of p.a[i]
+    inline mint coef(const int i) const { return (i < a.size() && i >= 0) ? a[i]: mint(0); }
+	mint operator[](const int i) const { return (i < a.size() && i >= 0) ? a[i]: mint(0); } //Beware!! p[i] = k won't change the value of p.a[i]
 	bool is_zero() const {return a.empty();}
     poly operator + (const poly &x) const {
         int n = max(size(), x.size());
@@ -208,7 +208,7 @@ struct poly {
         return ans;
     }
     poly integrate() const {
-        int n = size(); vector<mint> ans(n);
+        int n = size(); vector<mint> ans(n + 1);
         for(int i = 0; i < size(); i++) ans[i + 1] = coef(i) / (i + 1);
         return ans;
     }
@@ -439,3 +439,4 @@ int32_t main()
     for(int i = 1; i <= m; i++) cout << a[i] * 2 << '\n';
     return 0;
 }
+//https://codeforces.com/problemset/problem/438/E

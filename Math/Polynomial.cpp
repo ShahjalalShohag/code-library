@@ -373,6 +373,11 @@ struct poly {
 	}
 	vector<mint> eval(vector<poly> &tree, int v, int l, int r, vector<mint> &vec) { // auxiliary evaluation function
 		if(l == r) return {eval(vec[l])};
+		if (size() < 400) {
+			vector<mint> ans(r - l + 1, 0);
+			for (int i = l; i <= r; i++) ans[i - l] = eval(vec[i]);
+			return ans; 
+		}
 		int mid = l + r >> 1;
 		auto A = (*this % tree[2 * v]).eval(tree, 2 * v, l, mid, vec);
 		auto B = (*this % tree[2 * v + 1]).eval(tree, 2 * v + 1, mid + 1, r, vec);

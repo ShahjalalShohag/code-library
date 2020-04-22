@@ -45,21 +45,6 @@ vector<mint> multiply(vector<mint> a, vector<mint> b) {
 	}
 	return ans;
 }
-vector<mint> divide(vector<mint> a, vector<mint> b) {
-	vector<mint> A = a;
-	vector<mint> ans;
-	while(A.size() >= b.size()) {
-		ans.push_back(A.back() / b.back());
-		if(ans.back() != mint(0)) {
-			for(size_t i = 0; i < b.size(); i++) {
-				A[A.size() - i - 1] -= ans.back() * b[b.size() - i - 1];
-			}
-		}
-		A.pop_back();
-	}
-	reverse(ans.begin(), ans.end());
-	return ans;
-}
 /*
 matrix form:
     1 x0  x0^2  ... x0^(n-1)
@@ -74,15 +59,22 @@ determinant of this matrix = mul_{1 <= i < j <= n}{x[j] - x[i]}
 vv inverse(vector<mint> &x) {
 	int n = x.size();
 	vv ans(n, vector<mint> (n, 0));
-	vector<mint> T = {1};
+	vector<mint> all(n + 1, 0); //(x - x0) * (x - x1) * ... * (x - x(n-1))
+	all[0] = 1;
 	for (int i = 0; i < n; i++) {
-		vector<mint> nw = {-x[i], 1};
-		T =multiply(T, nw);
+		for (int j = n; j >= 0; j--) {
+			all[j] *= -x[i];
+			if (j) all[j] += all[j - 1];
+		}
 	}
 	//lagrange
 	for (int i = 0; i < n; i++) {
-		vector<mint> nw = {-x[i], 1};
-		auto up = divide(T, nw);
+		vector <mint> up(n); //all / (x - xi)
+		mint rem = all[n];
+		for (int j = n - 1; j >= 0; --j) {
+			up[j] = rem;
+			rem = all[j] + rem * x[i];
+		}
 		mint down = 1;
 		for (int j = 0; j < n; j++) if (i != j) down *= x[i] - x[j];
 		up.resize(n); down = down.inv();

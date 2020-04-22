@@ -40,17 +40,28 @@ using mint = modint<mod>;
 //generates the polynomial explicitely
 vector<mint> Lagrange(vector<mint> &x, vector<mint> &y) {
 	int n = x.size();
-	vector<mint> res(n, 0), tmp(n, 0);
-	for(int k = 0; k < n; k++) {
-		for(int i = k + 1; i < n; i++) y[i] = (y[i] - y[k]) / (x[i] - x[k]);
-	}
-	mint last = 0; tmp[0] = 1;
-	for(int k = 0; k < n; k++) for(int i = 0; i < n; i++) {
-		res[i] += y[k] * tmp[i];
-		swap(last, tmp[i]);
-		tmp[i] -= last * x[k];
-	}
-	return res;
+    vector<mint> ans(n, 0);
+    vector<mint> all(n + 1, 0); //(x - x0) * (x - x1) * ... * (x - x(n-1))
+    all[0] = 1;
+    for (int i = 0; i < n; i++) {
+        for (int j = n; j >= 0; j--) {
+            all[j] *= -x[i];
+            if (j) all[j] += all[j - 1];
+        }
+    }
+    for (int i = 0; i < n; i++) {
+        vector <mint> up(n); //all / (x - xi)
+        mint rem = all[n];
+        for (int j = n - 1; j >= 0; --j) {
+            up[j] = rem;
+            rem = all[j] + rem * x[i];
+        }
+        mint down = 1;
+        for (int j = 0; j < n; j++) if (i != j) down *= x[i] - x[j];
+        up.resize(n); down = down.inv() * y[i];
+        for (int j = 0; j < n; j++) ans[j] += up[j] * down;
+    }
+	return ans;
 }
 
 int32_t main() {
@@ -65,5 +76,6 @@ int32_t main() {
     mint ans = 0;
     for (int i = 0; i < p.size(); i++) ans += p[i] * mint(n).pow(i);
     cout << ans << '\n';
+    cout << 1.0 * clock() / CLOCKS_PER_SEC << '\n';
     return 0;
 }

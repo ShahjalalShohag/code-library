@@ -49,6 +49,7 @@ struct cmplx {
     }
 } w(0, 1), w2(mod - 1, mod - 1);
 
+//(mod + 1) should be divisible by 3
 typedef vector<cmplx> poly;
 struct FWHT {
     const int BIT = 11; // log2(MAX VALUE)

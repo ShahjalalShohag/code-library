@@ -3,6 +3,7 @@ using namespace std;
 
 const int N = 3e5 + 9;
 
+mt19937 rnd(chrono::steady_clock::now().time_since_epoch().count());
 struct Kuhn {
 	int n; vector<vector<int>> g;
 	vector<int> l, r; vector<bool> vis;
@@ -27,11 +28,14 @@ struct Kuhn {
 		return false;
 	}
 	int maximum_matching() {
+		for (int i = 1; i <= n; i++) shuffle(g[i].begin(), g[i].end(), rnd);
+		vector<int> p(n); iota(p.begin(), p.end(), 1);
+		shuffle(p.begin(), p.end(), rnd);
 		bool ok = true;
 		while (ok) {
 			ok = false;
 			vis.assign(n + 1, false);
-			for (int i = 1; i <= n; i++) if(l[i] == -1) ok |= yo(i);
+			for (auto &i: p) if(l[i] == -1) ok |= yo(i);
 		}
 		int ans = 0;
 		for (int i = 1; i <= n; i++) ans += l[i] != -1;

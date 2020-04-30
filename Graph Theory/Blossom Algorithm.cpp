@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-const int N = 300 + 9;
+const int N = 2e3 + 9;
 
 mt19937 rnd(chrono::steady_clock::now().time_since_epoch().count());
 struct Blossom {
@@ -9,6 +9,7 @@ struct Blossom {
     int n; bool ad[N];
     vector<int> g[N];
     queue<int> Q;
+    Blossom() {}
     Blossom(int _n) {
         n = _n; t = 0;
         for (int i = 0; i <=_n; ++i) {
@@ -96,17 +97,28 @@ struct Blossom {
         for(int i = 1; i <= n; ++i) if (!match[i] && bfs(i)) ++ans;
         return ans;
     }
-};
+}M;
 int32_t main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0);
-    int n, m; cin >> n >> m;
-    Blossom M(n);
-    while (m--) {
-    	int u, v; cin >> u >> v;
-    	M.add_edge(u, v);
+    int t; cin >> t;
+    while (t--) {
+        int n, m; cin >> n >> m;
+        M = Blossom (n);
+        while (m--) {
+            int u, v; cin >> u >> v;
+            M.add_edge(u, v);
+        }
+        int ans = M.maximum_matching();
+        if (ans * 2 == n) cout << 0 << '\n';
+        else {
+            memset(M.ad, 0, sizeof M.ad);
+            for (int i = 1; i <= n; i++) if (M.match[i] == 0) M.bfs(i);
+            int ans = 0;
+            for (int i = 1; i <= n; i++) ans += M.ad[i]; //nodes which are unmatched in some maximum matching
+            cout << ans << '\n';
+        }
     }
-    cout << M.maximum_matching() << '\n';
-    for (int i = 1; i <= n; i++) if (i < M.match[i]) cout << i << ' ' << M.match[i] << '\n';
     return 0;
 }
+//https://www.codechef.com/problems/HAMILG

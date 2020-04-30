@@ -5,24 +5,27 @@ const int N = 405;
 
 // Complexity: O(n^3) but slower when the graph is dense
 // It finds maximum cost matching on a general graph, not necessarily with maximum matching
+// for mincost set initial weights to -inf and do the same on the 72nd line too
+// and add -weight and return -maxmatch()
+// not tested for mincost
 // 1-indexed
-int p[N];
 struct RandomizedMatching {
 	long long G[N][N], dis[N];
-	int match[N], stk[N], id[N], vis[N];
+	int match[N];
+	int mat[N], stk[N], id[N], vis[N];
 	int n, top;
 	const long long inf = 1e18;
 	RandomizedMatching() {}
 	RandomizedMatching(int _n) {
 		n = _n; top = 0;
-		for (int i = 1; i <= n; i++) {
-			for (int j = 1; j <= n; j++) {
+		memset(match, 0, sizeof match);
+		for (int i = 1; i <= n + 1; i++) {
+			for (int j = 1; j <= n + 1; j++) {
 				G[i][j] = 0;
 			}
 		}
 	}
 	void add_edge(int u, int v, long long w) {
-		assert(w > 0);
 		G[u][v] = max(G[u][v], w);
 		G[v][u] = max(G[v][u], w);
 	}
@@ -31,8 +34,8 @@ struct RandomizedMatching {
 		if (vis[u]) return true;
 		vis[u] = true;
 		for (int i = 1; i <= n; ++ i) {
-			if (i != u && i != match[u] && !vis[i]) {
-				int v = match[i];
+			if (i != u && i != mat[u] && !vis[i]) {
+				int v = mat[i];
 				if (dis[v] < dis[u] + G[u][i] - G[i][v]) {
 					dis[v] = dis[u] + G[u][i] - G[i][v];
 					if (spfa(v)) return true;
@@ -44,7 +47,7 @@ struct RandomizedMatching {
 	}
 	long long maximum_matching() {
 		for (int i = 1; i <= n; ++ i) id[i] = i;
-		for (int i = 1; i <= n; i += 2) match[i] = i + 1, match[i + 1] = i;
+		for (int i = 1; i <= n; i += 2) mat[i] = i + 1, mat[i + 1] = i;
 		for (int times = 0, flag; times < 3; ) { //increase the iteration value for higher probability
 			memset(dis, 0, sizeof(dis));
 			memset(vis, 0, sizeof(vis));
@@ -52,13 +55,13 @@ struct RandomizedMatching {
 			for (int i = 1; i <= n; ++ i) {
 				if (spfa(id[i])) {
 					flag = 1;
-					int t = match[stk[top - 1]], j = top - 2;
+					int t = mat[stk[top - 1]], j = top - 2;
 					while (stk[j] != stk[top - 1]) {
-						match[t] = stk[j];
-						swap(t, match[stk[j]]);
+						mat[t] = stk[j];
+						swap(t, mat[stk[j]]);
 						-- j;
 					}
-					match[t] = stk[j]; match[stk[j]] = t;
+					mat[t] = stk[j]; mat[stk[j]] = t;
 					break;
 				}
 			}
@@ -67,8 +70,8 @@ struct RandomizedMatching {
 		}
 		long long ans = 0;
 		for (int i = 1; i <= n; ++ i) {
-			if (match[i] <= n && i < match[i]) {
-				if (G[i][match[i]] != 0) ans += G[i][match[i]], p[i] = match[i], p[match[i]] = i;
+			if (mat[i] <= n && i < mat[i]) {
+				if (G[i][mat[i]] != 0) ans += G[i][mat[i]], match[i] = mat[i], match[mat[i]] = i;
 			}
 		}
 		return ans;
@@ -84,6 +87,6 @@ int32_t main() {
 		M.add_edge(u, v, w);
 	}
 	cout << M.maximum_matching() << '\n';
-	for (int i = 1; i <= n; i++) cout << p[i] << ' '; cout << '\n';
+	for (int i = 1; i <= n; i++) cout << M.match[i] << ' '; cout << '\n';
     return 0;
 }

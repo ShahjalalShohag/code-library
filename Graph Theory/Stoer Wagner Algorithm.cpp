@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-const int N = 905;
+const int N = 155;
 
 //O(n^3) but faster, 1 indexed
 mt19937 rnd(chrono::steady_clock::now().time_since_epoch().count());
@@ -18,13 +18,13 @@ struct StoerWagner {
     void add_edge(int u, int v, long long w) { //undirected edge, multiple edges are merged into one edge
         if (u != v) {
             G[u][v] += w;
-            //G[v][u] += w;
+            G[v][u] += w;
         }
     }
     long long solve() {
         long long ans = inf;
         for (int i = 0; i < n; ++ i) idx[i] = i + 1;
-       	shuffle(idx, idx + n, rnd);
+        shuffle(idx, idx + n, rnd);
         while (n > 1) {
             int t = 1, s = 0;
             for (int i = 1; i < n; ++ i) {
@@ -36,7 +36,7 @@ struct StoerWagner {
             for (int i = 1; i < n; ++ i) {
                 if (i == n - 1) {
                     if (ans > dis[idx[t]]) ans = dis[idx[t]]; //idx[s] - idx[t] is in two halves of the  mincut
-                	if (ans == 0) return 0;
+                    if (ans == 0) return 0;
                     for (int j = 0; j < n; ++ j) {
                         G[idx[s]][idx[j]] += G[idx[j]][idx[t]];
                         G[idx[j]][idx[s]] += G[idx[j]][idx[t]];
@@ -59,15 +59,16 @@ struct StoerWagner {
 int32_t main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0);
-    int n; cin >> n;
-    StoerWagner st(n);
-    for (int i = 1; i <= n; i++) {
-    	for (int j = 1; j <= n; j++) {
-    		char ch; cin >> ch;
-    		if (ch == '1') st.add_edge(i, j, 1);
-    	}
+    int t, cs = 0; cin >> t;
+    while (t--) {
+        int n, m; cin >> n >> m;
+        StoerWagner st(n);
+        while (m--) {
+            int u, v, w; cin >> u >> v >> w;
+            st.add_edge(u, v, w);
+        }
+        cout << "Case #" << ++cs << ": " << st.solve() << '\n';
     }
-    cout << st.solve() * 2 << '\n';
     return 0;
 }
-//https://www.spoj.com/problems/ADABANKET/
+//https://vjudge.net/problem/UVA-10989

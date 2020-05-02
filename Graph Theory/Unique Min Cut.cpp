@@ -67,7 +67,7 @@ void dfs1(int u) {
 	if (vis[u]) return;
 	vis[u] = 1;
 	for (auto e: F.g[u]) {
-		if (e.id != -1 && e.flow < e.w) { //e.id != -1, is it needed? check if it is a forward edge
+		if (e.flow < e.w) {
 			dfs1(e.to);
 		}
 	}
@@ -76,7 +76,7 @@ void dfs2(int u) {
 	if (vis[u]) return;
 	vis[u] = 1;
 	for (auto e: F.g[u]) {
-		if (e.id == -1 && abs(e.flow) < F.g[e.to][e.rev].w) {//e.id == 1, is it needed? check if it is a backward edge
+		if (abs(e.flow) < F.g[e.to][e.rev].w) {
 			dfs2(e.to);
 		}
 	}

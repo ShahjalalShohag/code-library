@@ -39,26 +39,27 @@ template <int32_t MOD> ostream & operator << (ostream & out, modint<MOD> n) { re
 using mint = modint<mod>;
 
 // number of partitions of a number
+// O(nsqrt(n))
 vector<mint> Gen(int n) {
-	vector<mint> ans(n + 1);
-	vector<pair<int, int>> gp;
-	gp.emplace_back(0, 0);
-	for(int i = 1; gp.back().second <= n; i++) {
-		gp.emplace_back(i % 2 ? 1 : -1, i * (3*i - 1) / 2);
-		gp.emplace_back(i % 2 ? 1 : -1, i * (3*i + 1) / 2);
-	}
-	ans[1] = 1;
-	for(int i = 2; i <= n; i++) {
-		for(auto it : gp) if(i >= it.second) ans[i] += ans[i - it.second] * it.first;
-	}
-	return ans;
+    vector<mint> ans(n + 1);
+    vector<pair<int, int>> gp;
+    gp.emplace_back(0, 0);
+    for(int i = 1; gp.back().second <= n; i++) {
+        gp.emplace_back(i % 2 ? 1 : -1, i * (3*i - 1) / 2);
+        gp.emplace_back(i % 2 ? 1 : -1, i * (3*i + 1) / 2);
+    }
+    ans[1] = 1;
+    for(int i = 2; i <= n; i++) {
+        for(auto it : gp) if(i >= it.second) ans[i] += ans[i - it.second] * it.first;
+    }
+    return ans;
 }
 int32_t main() {
-	ios_base::sync_with_stdio(0);
-	cin.tie(0);
-	int n = 200000;
-	auto ans = Gen(n); 
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    int n = 500000;
+    auto ans = Gen(n); 
     cout << ans[1] << ' ' << ans[n - 1] << ' ' << ans[n] << '\n'; 
-    cout << 1.0 * (clock()) / CLOCKS_PER_SEC << '\n'; //2.5sec
+    cout << 1.0 * (clock()) / CLOCKS_PER_SEC << '\n'; //1.5sec on CF
     return 0;
 }

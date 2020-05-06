@@ -39,7 +39,6 @@ template <int32_t MOD> ostream & operator << (ostream & out, modint<MOD> n) { re
 using mint = modint<mod>;
 
 // number of partitions of a number
-//O(n^2)
 vector<mint> Gen(int n) {
 	vector<mint> ans(n + 1);
 	vector<pair<int, int>> gp;
@@ -57,8 +56,9 @@ vector<mint> Gen(int n) {
 int32_t main() {
 	ios_base::sync_with_stdio(0);
 	cin.tie(0);
-	int n = 10;
-	auto ans = Gen(n);
-	for (int i = 1; i <= n; i++) cout << ans[i] << '\n';
+	int n = 200000;
+	auto ans = Gen(n); 
+    cout << ans[1] << ' ' << ans[n - 1] << ' ' << ans[n] << '\n'; 
+    cout << 1.0 * (clock()) / CLOCKS_PER_SEC << '\n'; //2.5sec
     return 0;
 }

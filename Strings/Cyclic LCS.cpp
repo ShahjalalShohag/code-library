@@ -3,6 +3,7 @@ using namespace std;
 
 const int N = 2010;
 /*Cyclic Longest Common Subsequence
+maximum of lcs(any cyclic shift of s, any cyclic shift of t)
 O(nm)*/
 int dp[N * 2][N], from[N * 2][N];
 int yo(string s, string t) {

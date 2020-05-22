@@ -19,7 +19,7 @@ long long cross(PT a, PT b, PT c) {
 // it only supports efficient (O(log^2n)) deletion of points, 
 // which is enough to compute nested convex hulls in O(nlog^2n)
 // it assumes that all points are distinct
-struct UpperHull {
+struct LeftHull {
     vector<PT> ps;
     struct node {
         int bl, br;
@@ -106,7 +106,7 @@ struct UpperHull {
             get_hull(nodes[w].rc, nodes[w].br, r, res);
         }
     }
-    UpperHull(const vector<PT>& ps): ps(ps), nodes(ps.size() * 2), root(0) {
+    LeftHull(const vector<PT>& ps): ps(ps), nodes(ps.size() * 2), root(0) {
         build(0, 0, ps.size());
     }
     vector<int> get_hull() {
@@ -131,21 +131,21 @@ int main() {
         id[{x, y}] = i;
     }
     sort(pts.begin(), pts.end());
-    UpperHull up(pts);
+    LeftHull left(pts);
     reverse(pts.begin(), pts.end());
     for (auto& p:pts) p = -p;
-    UpperHull dn(pts);
+    LeftHull right(pts);
     for (auto& p:pts) p = -p;
     reverse(pts.begin(), pts.end());
     for (int id = 1, cnt = 0; cnt < n; id++) {
         set<int> hull;
-        for (int i: up.get_hull()) hull.insert(i);
-        for (int i: dn.get_hull()) hull.insert(n - 1 - i);
+        for (int i: left.get_hull()) hull.insert(i);
+        for (int i: right.get_hull()) hull.insert(n - 1 - i);
         for (int i: hull) {
             assert(!layer[i]);
             cnt++; layer[i] = id;
-            up.erase(i);
-            dn.erase(n - 1 - i);
+            left.erase(i);
+            right.erase(n - 1 - i);
         }
     }
     for (int i = 0; i < n; i++) ans[id[pts[i]]] = layer[i];

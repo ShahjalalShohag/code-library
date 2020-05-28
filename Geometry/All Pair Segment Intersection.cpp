@@ -115,7 +115,7 @@ struct seg {
     seg(PT a, PT b, int c) {
         p = a; q = b; id = c;
     }
-    double get_y(double x) const {
+    double eval_y(double x) const {
         if (fabs(p.x - q.x) < eps) return p.y;
         return p.y + (q.y - p.y) * (x - p.x) / (q.x - p.x);
     }
@@ -134,7 +134,7 @@ bool intersect (const seg & a, const seg & b) {
 }
 bool operator < (const seg& a, const seg& b) {
     double x = max(min(a.p.x, a.q.x), min(b.p.x, b.q.x));
-    return a.get_y(x) < b.get_y(x) - eps;
+    return a.eval_y(x) < b.eval_y(x);
 }
 struct event {
     double x;
@@ -142,8 +142,8 @@ struct event {
     event() {}
     event(double x, int ty, int id) : x(x), ty(ty), id(id) {}
     bool operator < (const event& e) const {
-        if (fabs(x - e.x) > eps) return x < e.x;
-        return ty > e.ty;
+        if (fabs(x - e.x) >= eps) return x < e.x;
+        return make_pair(ty, id) < make_pair(e.ty, e.id);
     }
 };
 typedef set<seg>::iterator iter;
@@ -156,27 +156,30 @@ pair<int, int> any_intersection(const vector<seg>& a) {
         e.push_back(event(max(a[i].p.x, a[i].q.x), -1, i));
     }
     sort(e.begin(), e.end());
-	set<seg> cur;
-	vector<iter> where;
+    set<seg> cur;
+    vector<iter> where;
     where.resize((int)a.size());
-    for (int i = 0; i < (int)e.size(); ++i) {
-        int id = e[i].id;
-        if (e[i].ty == +1) {
-            iter nxt = cur.lower_bound(a[id]);
-            iter prv = nxt == cur.begin() ? cur.end() : prev(nxt);;
-            if (nxt != cur.end() && intersect(*nxt, a[id])) return make_pair(nxt->id, id);
-            if (prv != cur.end() && intersect(*prv, a[id])) return make_pair(prv->id, id);
-            where[id] = cur.insert(nxt, a[id]);
-        } else {
-        	auto nw = where[id];
-            if (nw == cur.end()) continue;
-            iter nxt = next(nw);
-            iter prv = nw == cur.begin() ? cur.end() : prev(nw);;
-            if (nxt != cur.end() && prv != cur.end() && intersect(*nxt, *prv))
-                return make_pair(prv->id, nxt->id);
-            cur.erase(nw);
+    try {
+        for (int i = 0; i < (int)e.size(); ++i) {
+            int id = e[i].id;
+            if (e[i].ty == +1) {
+                iter nxt = cur.lower_bound(a[id]);
+                iter prv = nxt == cur.begin() ? cur.end() : prev(nxt);;
+                if (nxt != cur.end() && intersect(*nxt, a[id])) return make_pair(nxt->id, id);
+                if (prv != cur.end() && intersect(*prv, a[id])) return make_pair(prv->id, id);
+                where[id] = cur.insert(nxt, a[id]);
+            } else {
+                auto nw = where[id];
+                if (nw == cur.end()) continue;
+                iter nxt = next(nw);
+                iter prv = nw == cur.begin() ? cur.end() : prev(nw);;
+                if (nxt != cur.end() && prv != cur.end() && intersect(*nxt, *prv))
+                    return make_pair(prv->id, nxt->id);
+                cur.erase(nw);
+            }
         }
     }
+    catch(...) {return {0, 1};}
     return make_pair(-1, -1);
 }
 PT a[N], d[N];
@@ -194,7 +197,7 @@ int32_t main() {
     }
     double l = 0, r = 1e12;
     int ok = 0;
-    while (r - l >= 1e-8) {
+    while (r - l >= 1e-7) {
         double mid = (l + r) * 0.5;
         vector<seg> v;
         for (int i = 0; i < n; i++) {

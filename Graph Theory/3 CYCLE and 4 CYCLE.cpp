@@ -75,3 +75,4 @@ int32_t main()
     cout << cycle3(n) << ' ' << cycle4(n) << '\n';
     return 0;
 }
+// https://codeforces.com/gym/102028/problem/L

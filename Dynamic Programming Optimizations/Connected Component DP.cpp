@@ -31,3 +31,4 @@ int32_t main() {
 	cout << yo(1, 0, 0, 0) << '\n';
     return 0;
 }
+// https://oj.uz/problem/view/JOI16_skyscraper

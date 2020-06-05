@@ -40,6 +40,7 @@ using mint = modint<mod>;
 
 // number of partitions of a number
 // O(nsqrt(n))
+// partition of i = ans[i + 1]
 vector<mint> Gen(int n) {
     vector<mint> ans(n + 1);
     vector<pair<int, int>> gp; //(sign, generalized pentagonal numbers)

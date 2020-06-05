@@ -55,4 +55,4 @@ int32_t main() {
     cout << dp[n] << '\n';
     return 0;
 }
-//https://vjudge.net/problem/POJ-1180
+//https://vjudge.net/problem/OpenJ_Bailian-1180

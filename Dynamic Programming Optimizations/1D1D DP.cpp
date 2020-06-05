@@ -43,7 +43,7 @@ int32_t main() {
                 int l = y + 1, r = n + 1;
                 while (l < r) {
                     int mid = (l + r) / 2;
-                    if (dp[x] + w(x, mid) <= dp[oldk] + w(oldk, mid)) r = mid;
+                    if (dp[x] + w(x, mid) < dp[oldk] + w(oldk, mid)) r = mid;
                     else l = mid + 1;
                 }
                 if (r != n + 1) v.push_back(make_pair(r, x));

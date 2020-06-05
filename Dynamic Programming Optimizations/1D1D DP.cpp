@@ -16,7 +16,7 @@ Complexity: O(nlogn)*/
 int n, s, t[N], f[N];
 ///the cost function, (i, x]
 int w(int i, int x) {
-	if (i >= x) return 1e9; //inf
+	if (i >= x) return 1e9; //inf > w(0, n)
 	return s * (f[n] - f[i]) + t[x] * (f[x] - f[i]); 
 }
 int dp[N];

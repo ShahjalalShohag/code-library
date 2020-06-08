@@ -119,6 +119,26 @@ struct modint {
         }
         return y;
     }
+    modint sqrt() const {
+        if (value == 0) return 0;
+        if (MOD == 2) return 1;
+        if (pow((MOD - 1) >> 1) == MOD - 1)  return 0; // does not exist, it should be -1, but kept as 0 for this program
+        unsigned int Q = MOD - 1, M = 0, i;
+        modint zQ; while (!(Q & 1)) Q >>= 1, M++;
+        for (int z = 1;; z++) {
+            if (modint(z).pow((MOD - 1) >> 1) == MOD - 1) {
+                zQ = modint(z).pow(Q); break;
+            }
+        }
+        modint t = pow(Q), R = pow((Q + 1) >> 1), r;
+        while (true) {
+            if (t == 1) { r = R; break; }
+            for (i = 1; modint(t).pow(1 << i) != 1; i++);
+            modint b = modint(zQ).pow(1 << (M - 1 - i));
+            M = i, zQ = b * b, t = t * zQ, R = R * b;
+        }
+        return min(r, - r + MOD);
+    }
     modint<MOD> inv() const { return pow(MOD - 2); }  // MOD must be a prime
     inline modint<MOD> operator /  (modint<MOD> other) const { return *this *  other.inv(); }
     inline modint<MOD> operator /= (modint<MOD> other)       { return *this *= other.inv(); }
@@ -205,7 +225,7 @@ struct poly {
 		reverse(ans.a.begin(), ans.a.end());
 		return ans.mod_xk(n);
 	}
-    poly differantiate() const {
+    poly differentiate() const {
         int n = size(); vector<mint> ans(n);
         for(int i = 1; i < size(); i++) ans[i - 1] = coef(i) * i;
         return ans;
@@ -251,7 +271,7 @@ struct poly {
 	poly& operator %= (const poly &t) {return *this = divmod(t).second;}
 	poly log(int n) const { //ln p(x) mod x^n
 		assert(a[0] == 1);
-		return (differantiate().mod_xk(n) * inverse(n)).integrate().mod_xk(n);
+		return (differentiate().mod_xk(n) * inverse(n)).integrate().mod_xk(n);
 	}
 	poly exp(int n) const { //e ^ p(x) mod x^n
 		if(is_zero()) return {1};
@@ -265,7 +285,7 @@ struct poly {
 		}
 		return ans.mod_xk(n);
 	}
-	//better for small k k < 100000 || n > 100000
+	//better for small k, k < 100000
 	poly pow(int k, int n) const { // p(x)^k mod x^n
 		if(is_zero()) return *this;
 		poly ans({1}), b = mod_xk(n);
@@ -281,7 +301,7 @@ struct poly {
 		int res = 0; while(a[res] == 0) res++;
 		return res;
 	}
-	//better for k > 100000, n < 100000
+	//better for k > 100000
 	poly pow2(int k, int n) const { // p(x)^k mod x^n
 		if(is_zero()) return *this;
 		int i = leading_xk();
@@ -293,6 +313,28 @@ struct poly {
 		ans *= (j.pow(k));
 		return ans;
 	}
+	// if the poly is not zero but the result is zero, then no solution
+    poly sqrt(int n) const {
+        if ((*this)[0] == mint(0)) {
+            for (int i = 1; i < size(); i++) {
+                if ((*this)[i] != mint(0)) {
+                    if (i & 1) return {};
+                    if (n - i / 2 <= 0) break;
+                    return div_xk(i).sqrt(n - i / 2).mul_xk(i / 2);
+                }
+            }
+            return {};
+        }
+        mint s = (*this)[0].sqrt();
+        if (s == 0)  return {};
+        poly y = *this / (*this)[0];
+        poly ret({1});
+        mint inv2 = mint(1) / 2;
+        for (int i = 1; i < n; i <<= 1) {
+            ret = (ret + y.mod_xk(i << 1) * ret.inverse(i << 1)) * inv2;
+        }
+        return ret.mod_xk(n) * s;
+    }
 	poly root(int n, int k = 2) const { //kth root of p(x) mod x^n
 		if(is_zero()) return *this;
 		if (k == 1) return mod_xk(n);
@@ -406,7 +448,7 @@ poly interpolate(vector<mint> x, vector<mint> y) { //interpolates minimum polyno
 	int n = x.size(); assert(n == (int)y.size());//assert(all x are distinct)
 	vector<poly> tree(4 * n);
 	poly tmp({1});
-	return tmp.build(tree, 1, 0, n - 1, x).differantiate().interpolate(tree, 1, 0, n - 1, 0, n - 1, y);
+	return tmp.build(tree, 1, 0, n - 1, x).differentiate().interpolate(tree, 1, 0, n - 1, 0, n - 1, y);
 }
 //O(a.size() * b.size())
 //if gcd.size() - 1 = number of common roots between a and b

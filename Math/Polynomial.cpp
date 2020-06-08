@@ -393,6 +393,7 @@ struct poly {
 	//n log(n)
 	poly shift(mint a) { //p(x + a)
 	    int n = size();
+	    if (n == 1) return *this;
 	    vector<poly> pw(n);
 	    pw[0] = poly({1});
 	    pw[1] = poly({a, 1});

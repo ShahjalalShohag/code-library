@@ -24,10 +24,6 @@ struct SuffixAutomaton {
         t[0].len = 0; t[0].link = -1; t[0].firstpos = 0;
     }
     void extend(char c) {
-        if (t[last].nxt.count(c) && t[t[last].nxt[c]].len == t[last].len + 1) {
-            last = t[last].nxt[c];
-            return;
-        }
         int cur = sz++;
         t[cur].len = t[last].len + 1;
         t[cur].firstpos = t[cur].len;

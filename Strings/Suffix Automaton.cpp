@@ -17,10 +17,12 @@ struct SuffixAutomaton {
     vector<node> t;
     vector<int> terminal;
     vector<long long> dp;
+    vector<vector<int>> g;
     SuffixAutomaton() {}
     SuffixAutomaton(int n) {
         t.resize(2 * n); terminal.resize(2 * n, 0);
         dp.resize(2 * n, -1); sz = 1; last = 0;
+        g.resize(2 * n);
         t[0].len = 0; t[0].link = -1; t[0].firstpos = 0;
     }
     void extend(char c) {
@@ -67,16 +69,20 @@ struct SuffixAutomaton {
         }
         last = cur;
     }
+    void build_tree() {
+        for (int i = 1; i < sz; i++) g[t[i].link].push_back(i);
+    }
     void build(string &s) {
         for (auto x: s) {
             extend(x);
             terminal[last] = 1;
         }
+        build_tree();
     }
     long long cnt(int i) { //number of times i-th node occurs in the string
         if (dp[i] != -1) return dp[i];
         long long ret = terminal[i];
-        for (auto &x: t[i].nxt) ret += cnt(x.second);
+        for (auto &x: g[i]) ret += cnt(x);
         return dp[i] = ret;
     }
 };
@@ -96,3 +102,4 @@ int32_t main() {
     }
     return 0;
 }
+

@@ -10,7 +10,6 @@ const int N = 3e5 + 9;
 -> path within series links to the root contains only O(log n) vertices
 -> cnt constains the number of palindromic suffixes of the node
 */
-int ans[N], series_ans[N];
 struct PalindromicTree {
     struct node {
         int nxt[26], len, st, en, link, diff, slink, cnt, oc;

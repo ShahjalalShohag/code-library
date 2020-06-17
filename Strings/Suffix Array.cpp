@@ -22,7 +22,7 @@ void suffix_array_DA(int n, int m) {
         for (i = 0; i < m; i++) buc[i] = 0;
         for (i = 0; i < n; i++) buc[x[y[i]]]++;
         for (i = 1; i < m; i++) buc[i] += buc[i-1];
-        for (i = n - 1; i >= 0; i--) suf[--buc[ x[y[i]]]] = y[i];
+        for (i = n - 1; i >= 0; i--) suf[--buc[x[y[i]]]] = y[i];
         for (swap(x, y), x[suf[0]] = 0, i = 1, j = 1; i < n; i++) {
             x[suf[i]] = cmp(y, suf[i - 1], suf[i], l) ? j - 1 : j++;
         }
@@ -39,7 +39,7 @@ struct SuffixArray {
 	vector<vector<int>> t;
 	vector<int> lg;
 	SuffixArray() {}
-	SuffixArray(string &_s) {
+	SuffixArray(string _s) {
 		n = _s.size(); s = _s;
 		for (int i = 0; i < n; i++) str[i] = s[i]; //for integers, each element should be positive
 	    str[n] = '\0';
@@ -74,7 +74,7 @@ struct SuffixArray {
 	    	t[i][0] = lcp[i];
 	    }
 	    for (int k = 1; k < LG; ++k) {
-            for (int i = 1; i + (1 << k) - 1 < sz; ++i) {
+            for (int i = 0; i + (1 << k) - 1 < sz; ++i) {
                 t[i][k] = min(t[i][k - 1], t[i + (1 << (k - 1))][k - 1]);
             }
 	    }

@@ -39,8 +39,8 @@ struct Mat {
 		assert(m == b.n);
 		Mat ans = Mat(n, b.m);
 		for(int i = 0; i < n; i++) {
-			for(int k = 0; k < m; k++) {
-				for(int j = 0; j < b.m; j++) {
+			for(int j = 0; j < m; j++) {
+				for(int k = 0; k < b.n; k++) {
 					ans.a[i][j] = (ans.a[i][j] + 1LL * a[i][k] * b.a[k][j] % mod) % mod;
 				}
 			}

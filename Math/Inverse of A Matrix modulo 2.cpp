@@ -4,7 +4,7 @@ using namespace std;
 const int N = 2005;
 
 bitset<N> z;
-// permanent after inverting mat[i][j] = !inv[j][i]
+// permanent after inverting mat[i][j] = mat[i][j] ^ inv[j][i]
 vector<bitset<N>> inverse(int n, vector<bitset<N>> mat) {
 	vector<bitset<N>> inv(n, z);
 	for (int i = 0; i < n; i++) inv[i][i] = 1;

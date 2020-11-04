@@ -19,10 +19,10 @@ struct PDSU
 	int count() { return c; }
 	void unite(int x, int y) {
 		if((x = root(x)) == (y = root(y))) return;
+		st.push({x, dep[x], y, dep[y]});
 		if(dep[x] <= dep[y]) par[x] = y, dep[y] += dep[x];
 		else par[y] = x, dep[x] += dep[y];
 		c--;
-		st.push({x, dep[x], y, dep[y]});
 	}
 	void snapshot() { st.push({-1, -1, -1, -1}); }
 	void rollback() {

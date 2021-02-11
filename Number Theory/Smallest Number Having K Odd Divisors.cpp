@@ -38,13 +38,13 @@ pair<double, int> yo(int i, long long n) {
   for (auto x: v) {
     if (x > n) break;
     if (n % x != 0) continue;
-    auto z = lgp[i + 1] * (x - 1);
+    auto z = lgp[i + 1] * (x - 1); // i for all divisors
     if (z > ans.first) {
       break;
     }
     auto cur = yo(i + 1, n / x);
     cur.first += z;
-    cur.second = 1LL * cur.second * power(primes[i + 1], x - 1) % mod;
+    cur.second = 1LL * cur.second * power(primes[i + 1], x - 1) % mod; // i for all divisors
     ans = min(ans, cur);
   }
   return dp[i][n] = ans;

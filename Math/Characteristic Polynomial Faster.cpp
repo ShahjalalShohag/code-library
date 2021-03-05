@@ -53,7 +53,7 @@ vector<vector<mint>> Hessenberg(vector<vector<mint>> a) {
   return a;
 }
 
-// finds the determinant of (a - xI) in O(n^2)
+// finds the determinant of (a - xI) in O(n^2), here a is a hessenberg matrix
 mint yo(vector<vector<mint>> a, mint x) {
   int n = a.size();
   for (int i = 0; i < n; i++) {

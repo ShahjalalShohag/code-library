@@ -167,11 +167,24 @@ struct LCT {
     link(p, u);
     return ans;
   }
+  long long component_sum(int u) {
+    return t[find_root(u)].subsum;
+  }
+  long long subtree_sum(int u) {
+    int p = get_parent(u);
+    if (p == 0) {
+      return component_sum(u);
+    }
+    cut(u);
+    long long ans = component_sum(u);
+    link(p, u);
+    return ans;
+  }
   // sum of the subtree of u when root is specified
   long long subtree_query(int u, int root) {
     int cur = find_root(u);
     make_root(root);
-    long long ans = t[u].subsum;
+    long long ans = subtree_sum(u);
     make_root(cur);
     return ans;
   }

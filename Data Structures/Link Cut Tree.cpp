@@ -7,12 +7,13 @@ struct node {
   int p = 0, c[2] = {0, 0}, pp = 0;
   bool flip = 0;
   int sz = 0, ssz = 0, vsz = 0; // sz -> aux tree size, ssz = subtree size in rep tree, vsz = virtual tree size
-  long long val = 0, sum = 0, lazy = 0;
+  long long val = 0, sum = 0, lazy = 0, subsum = 0, vsum = 0;
   node() {}
   node(int x) {
     val = x; sum = x;
     sz = 1; lazy = 0;
     ssz = 1; vsz = 0;
+    subsum = x; vsum = 0;
   }
 };
 struct LCT {
@@ -32,6 +33,7 @@ struct LCT {
     t[x].sum = t[l].sum + t[r].sum + t[x].val;
     t[x].sz = t[l].sz + t[r].sz + 1;
     t[x].ssz = t[l].ssz + t[r].ssz + t[x].vsz + 1;
+    t[x].subsum = t[l].subsum + t[r].subsum + t[x].vsum + t[x].val;
   }
   void push(int x) { 
     if (!x) return;
@@ -45,6 +47,8 @@ struct LCT {
     if (t[x].lazy) {
       t[x].val += t[x].lazy;
       t[x].sum += t[x].lazy * t[x].sz;
+      t[x].subsum += t[x].lazy * t[x].ssz;
+      t[x].vsum += t[x].lazy * t[x].vsz;
       if (l) t[l].lazy += t[x].lazy;
       if (r) t[r].lazy += t[x].lazy;
       t[x].lazy = 0;
@@ -76,6 +80,7 @@ struct LCT {
     t[l].flip ^= 1;
     swap(t[l].p, t[l].pp);
     t[u].vsz += t[l].ssz;
+    t[u].vsum += t[l].subsum;
     set(u, 0, 0);
   }
   // make the path from root to u a preferred path
@@ -85,8 +90,10 @@ struct LCT {
     for (int v = 0, u = _u; u; u = t[v = u].pp) {
       splay(u); splay(v);
       t[u].vsz -= t[v].ssz;
+      t[u].vsum -= t[v].subsum;
       int r = t[u].c[1];
       t[u].vsz += t[r].ssz;
+      t[u].vsum += t[r].subsum;
       t[v].pp = 0;
       swap(t[r].p, t[r].pp);
       set(u, 1, v);
@@ -101,6 +108,7 @@ struct LCT {
     access(u); splay(u);
     t[v].pp = u;
     t[u].vsz += t[v].ssz;
+    t[u].vsum += t[v].subsum;
   }
   void cut(int u) { // cut par[u] -> u, u is non root vertex
     access(u);
@@ -159,6 +167,15 @@ struct LCT {
     link(p, u);
     return ans;
   }
+  // sum of the subtree of u when root is specified
+  long long subtree_query(int u, int root) {
+    int cur = find_root(u);
+    make_root(root);
+    long long ans = t[u].subsum;
+    make_root(cur);
+    return ans;
+  }
+  // path sum
   long long query(int u, int v) {
     int cur = find_root(u);
     make_root(u); access(v);

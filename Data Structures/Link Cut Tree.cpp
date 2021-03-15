@@ -111,8 +111,13 @@ struct LCT {
   }
   // parent of u in the rep. tree
   int get_parent(int u) {
-    access(u);
-    return t[u].c[0];
+    access(u); splay(u); push(u);
+    u = t[u].c[0]; push(u);
+    while (t[u].c[1]) {
+      u = t[u].c[1]; push(u);
+    }
+    splay(u);
+    return u;
   }
   // root of the rep. tree containing this node
   int find_root(int u) {

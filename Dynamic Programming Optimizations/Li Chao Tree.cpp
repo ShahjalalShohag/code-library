@@ -1,91 +1,117 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-#define ll long long
-#define eb emplace_back
-#define nl '\n'
-#define deb(x) cerr << #x" = " << x << nl
-#define in() ( { int a ; scanf("%d", &a); a; } )
-
-const int N = 1e5 + 9;
-const int mod = 1e9 + 7;
+using ll = long long;
+const ll inf = 2e18;
 
 struct Line {
-    ll k, d;
-    ll eval(int x) {
-        return k * x + d;
+  ll m, c;
+  ll eval(ll x) {
+    return m * x + c;
+  }
+};
+struct node {
+  Line line;
+  node* left = nullptr;
+  node* right = nullptr;
+  node(Line line) : line(line) {}
+  void add_segment(Line nw, int l, int r, int L, int R) {
+    if (l > r || r < L || l > R) return;
+    int m = (l + 1 == r ? l : (l + r) / 2);
+    if (l >= L and r <= R) {
+      bool lef = nw.eval(l) < line.eval(l);
+      bool mid = nw.eval(m) < line.eval(m);
+      if (mid) swap(line, nw);
+      if (l == r) return;
+      if (lef != mid) {
+        if (left == nullptr) left = new node(nw);
+        else left -> add_segment(nw, l, m, L, R);
+      }
+      else {
+        if (right == nullptr) right = new node(nw);
+        else right -> add_segment(nw, m + 1, r, L, R);
+      }
+      return;
     }
+    if (max(l, L) <= min(m, R)) {
+      if (left == nullptr) left = new node({0, inf});
+      left -> add_segment(nw, l, m, L, R);
+    }
+    if (max(m + 1, L) <= min(r, R)) {
+      if (right == nullptr) right = new node ({0, inf});
+      right -> add_segment(nw, m + 1, r, L, R);
+    }
+  }
+  ll query_segment(ll x, int l, int r, int L, int R) {
+    if (l > r || r < L || l > R) return inf;
+    int m = (l + 1 == r ? l : (l + r) / 2);
+    if (l >= L and r <= R) {
+      ll ans = line.eval(x);
+      if (l < r) {
+        if (x <= m && left != nullptr) ans = min(ans, left -> query_segment(x, l, m, L, R));
+        if (x > m && right != nullptr) ans = min(ans, right -> query_segment(x, m + 1, r, L, R));
+      }
+      return ans;
+    }
+    ll ans = inf;
+    if (max(l, L) <= min(m, R)) {
+      if (left == nullptr) left = new node({0, inf});
+      ans = min(ans, left -> query_segment(x, l, m, L, R));
+    }
+    if (max(m + 1, L) <= min(r, R)) {
+      if (right == nullptr) right = new node ({0, inf});
+      ans = min(ans, right -> query_segment(x, m + 1, r, L, R));
+    }
+    return ans;
+  }
 };
 
-struct LiChaoNode {
-    Line line;
-    LiChaoNode* left = nullptr;
-    LiChaoNode* right = nullptr;
-
-    LiChaoNode(Line line) : line(line) {}
-
-    void add_line(Line nw, int l, int r) {
-        int m = (l + r) / 2;
-        bool lef = nw.eval(l) < line.eval(l);
-        bool mid = nw.eval(m) < line.eval(m);
-        if(mid) swap(line, nw);
-        if(l == r) return;
-        if(lef != mid) {
-            if(left == nullptr) left = new LiChaoNode(nw);
-            else left -> add_line(nw, l, m);
-        }
-        else{
-            if(right == nullptr) right = new LiChaoNode(nw);
-            else right -> add_line(nw, m + 1, r);
-        }
-    }
-
-    ll query(int x, int l, int r) {
-        ll val = line.eval(x);
-        int m = (l + r) / 2;
-        if(l < r) {
-            if(x <= m && left != nullptr) val = min(val, left -> query(x, l, m));
-            if(x > m && right != nullptr) val = min(val, right -> query(x, m + 1, r));
-        }
-        return val;
-    }
+struct LiChaoTree {
+  int L, R;
+  node* root;
+  LiChaoTree() : L(numeric_limits<int>::min() / 2), R(numeric_limits<int>::max() / 2), root(nullptr) {}
+  LiChaoTree(int L, int R) : L(L), R(R) {
+    root = new node({0, inf});
+  }
+  void add_line(Line line) {
+    root -> add_segment(line, L, R, L, R);
+  }
+  // y = mx + b: x in [l, r]
+  void add_segment(Line line, int l, int r) {
+    root -> add_segment(line, L, R, l, r);
+  }
+  ll query(ll x) {
+    return root -> query_segment(x, L, R, L, R);
+  }
+  ll query_segment(ll x, int l, int r) {
+    return root -> query_segment(x, l, r, L, R);
+  }
 };
 
-struct LiChaoTree
-{
-    int L, R;
-    LiChaoNode* root;
-
-    LiChaoTree() : L(numeric_limits<int>::min() / 2), R(numeric_limits<int>::max() / 2), root(nullptr) {}
-    LiChaoTree(int L, int R) : L(L), R(R) {
-        root = new LiChaoNode({0, numeric_limits<ll>::max() / 2});
+int32_t main() {
+  ios_base::sync_with_stdio(0);
+  cin.tie(0);
+  LiChaoTree t = LiChaoTree((int)-1e9, (int) 1e9);
+  int n, q; cin >> n >> q;
+  for (int i = 0; i < n; i++) {
+    ll l, r, a, b; cin >> l >> r >> a >> b;
+    r--;
+    t.add_segment({a, b}, l, r);
+  }
+  while (q--) {
+    int ty; cin >> ty;
+    if (ty == 0) {
+      ll l, r, a, b; cin >> l >> r >> a >> b;
+      r--;
+      t.add_segment({a, b}, l, r);
     }
-
-    void add_line(Line line) {
-        root -> add_line(line, L, R);
+    else {
+      ll x; cin >> x;
+      ll ans = t.query(x);
+      if (ans >= inf) cout << "INFINITY\n";
+      else cout << ans << '\n';
     }
-    ll query(int x) {
-        return root -> query(x, L, R);
-    }
-};
-
-
-int a[N], b[N];
-int32_t main()
-{
-    ios_base::sync_with_stdio(0);
-    cin.tie(0);
-
-    int n; cin >> n;
-    for(int i = 0; i < n; i++) cin >> a[i];
-    for(int i = 0; i < n; i++) cin >> b[i];
-    LiChaoTree t = LiChaoTree(0, (int) 1e9);
-    t.add_line({b[0], 0});
-    ll ans = 0;
-    for(int i = 1; i < n; i++){
-        ans = t.query(a[i]);
-        t.add_line({b[i], ans});
-    }
-    cout << ans << nl;
-    return 0;
+  }
+  return 0;
 }
+// https://judge.yosupo.jp/problem/segment_add_get_min

@@ -41,7 +41,7 @@ vector<int> multiply(vector<int> &f, vector<int> &g) {
     ntt(a, 1), ntt(b, 1);
     for (int i = 0; i < lim; ++i) a[i] = (long long) a[i] * b[i] % mod;
     ntt(a, 0);
-    while((int)a.size() && a.back() == 0) a.pop_back();
+    //while((int)a.size() && a.back() == 0) a.pop_back();
     return a;
 }
 int fact[N], ifact[N];
@@ -74,6 +74,8 @@ vector<int> range_mul(int n) { //(x+1)*(x+2)*(x+3)...(x+n)
 		int n_ = n >> 1;
 		vector<int> f = range_mul(n_);
 		vector<int> tmp = shift(f, n_);
+        f.resize(n_ + 1);
+        tmp.resize(n_ + 1);
 		return multiply(f, tmp);
 	}
 }

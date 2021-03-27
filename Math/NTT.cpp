@@ -77,7 +77,7 @@ vector<int> range_mul(int n) { //(x+1)*(x+2)*(x+3)...(x+n)
 		return multiply(f, tmp);
 	}
 }
-int stirling(int n, int k) {
+int f(int n, int k) {
     if(n == 0 && k == 0) return 1;
     if(n <= 0 || k <= 0) return 0;
     vector<int> x = vector<int>({0, 1});
@@ -97,7 +97,7 @@ int main()
 	ifact[N - 1] = POW(fact[N - 1], mod - 2);
 	for (int i = N - 1; i; --i) ifact[i - 1] = (long long) ifact[i] * i % mod;
     int n, a, b; cin >> n >> a >> b;
-    cout << 1LL * stirling(n - 1, a + b - 2) * ncr(a + b - 2, a - 1) % mod << '\n';
+    cout << 1LL * f(n - 1, a + b - 2) * ncr(a + b - 2, a - 1) % mod << '\n';
     return 0;
 }
 //https://codeforces.com/problemset/problem/960/G

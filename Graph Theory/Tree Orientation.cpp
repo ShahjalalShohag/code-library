@@ -1,3 +1,4 @@
+
 #include<bits/stdc++.h>
 using namespace std;
 
@@ -92,3 +93,4 @@ int32_t main() {
   return 0;
 }
 // https://szkopul.edu.pl/problemset/problem/3bBT-3VuSu78UsxTQSwaJzVo/site/?key=statement
+// https://codeforces.com/blog/entry/89228

@@ -61,3 +61,4 @@ int32_t main() {
   }
   return 0;
 }
+// https://codeforces.com/gym/100917/problem/F

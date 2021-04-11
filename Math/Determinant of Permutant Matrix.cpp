@@ -73,7 +73,7 @@ int main() {
     a[0] = P - 1;
     a[n] = 1;
     int ans = res(a, b);
-    ans = 1ll * ans * coef % P;
+    ans = 1ll * ans * coef % P; // dont multiply by coef for the ans to the cyclic matrix
     cout << ans << "\n";
     return 0;
 }

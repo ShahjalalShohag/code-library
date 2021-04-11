@@ -25,20 +25,25 @@ Poly operator%(Poly a, const Poly &b) {
     }
     return a;
 }
-int res(const Poly &a, const Poly &b) {
+// Let n = deg(A), m = deg(B). Treat deg(0) = 0.
+// a[n] != 0, b[m] != 0
+// R(A, B) := b[m]^n prod_{j=0..m-1} A(b_roots[j]) // counted with multiplicities
+// = (-1)^(mn) a[n]^m prod_{i=0..n-1} B(a_roots[i])
+// O(n * m)
+int resultant(const Poly &a, const Poly &b) {
     if (b.empty())
         return 0;
     if (b.size() == 1)
         return power(b[0], a.size() - 1);
     auto c = a % b;
-    return 1ll * power(b.back(), a.size() - c.size()) * (((a.size() & 1) | (b.size() & 1)) ? 1 : P - 1) % P * res(b, c) % P;
+    return 1ll * power(b.back(), a.size() - c.size()) * (((a.size() & 1) | (b.size() & 1)) ? 1 : P - 1) % P * resultant(b, c) % P;
 }
 int main() {
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     int n;
     cin >> n;
-    vector<int> a(n), p(n);
+    vector<int> a(n), p(n); // for cyclic matrix set p accordingly
     for (int i = 0; i < n; ++i)
         cin >> a[i];
     for (int i = 0; i < n; ++i) {
@@ -52,7 +57,7 @@ int main() {
             return 0;
         }
     }
-    vector<int> q(n); // first row of the cyclic matrix
+    vector<int> q(n);
     for (int i = n - 1, x = 0; i >= 0; --i) {
         q[i] = x;
         x = p[x];
@@ -72,8 +77,8 @@ int main() {
     a.assign(n + 1, 0);
     a[0] = P - 1;
     a[n] = 1;
-    int ans = res(a, b);
-    ans = 1ll * ans * coef % P; // dont multiply by coef for the ans to the cyclic matrix
+    int ans = resultant(a, b);
+    ans = 1ll * ans * coef % P;
     cout << ans << "\n";
     return 0;
 }

@@ -70,18 +70,16 @@ int ncr(ll n, ll r, int p, int k) {
   ans = 1LL * ans * power(p, t, mod) % mod;
   return ans;
 }
-
-// finds z such that z % x = a, z % y = b. 
-// here, z is unique modulo M = lcm(x,y).
-// returns (z, M). on failure, M = -1.
-pair<ll, ll> CRT(ll a, ll x, ll b, ll y) {
-  ll s, t;
-  ll d = extended_euclid(x, y, s, t);
-  if (a % d != b % d) return make_pair(0, -1);
-  ll m = x * y;
-  s %= m; s = (s + m) % m;
-  t %= m; t = (t + m) % m;
-  return make_pair((s * b % m * x % m + t * a % m * y % m) %  m / d, m / d);
+// finds x such that x % m1 = a1, x % m2 = a2. m1 and m2 may not be coprime
+// here, x is unique modulo m = lcm(m1, m2). returns (x, m). on failure, m = -1.
+pair<ll, ll> CRT(ll a1, ll m1, ll a2, ll m2) {
+  ll p, q;
+  ll g = extended_euclid(m1, m2, p, q);
+  if (a1 % g != a2 % g) return make_pair(0, -1);
+  ll m = m1 / g * m2;
+  p = (p % m + m) % m;
+  q = (q % m + m) % m;
+  return make_pair((p * a2 % m * (m1 / g) % m + q * a1 % m * (m2 / g) % m) %  m, m);
 }
 int spf[N];
 vector<int> primes;

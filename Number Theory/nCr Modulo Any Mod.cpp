@@ -71,7 +71,7 @@ int ncr(ll n, ll r, int p, int k) {
   return ans;
 }
 
-// find z such that z % x = a, z % y = b. 
+// finds z such that z % x = a, z % y = b. 
 // here, z is unique modulo M = lcm(x,y).
 // returns (z, M). on failure, M = -1.
 pair<ll, ll> CRT(ll a, ll x, ll b, ll y) {

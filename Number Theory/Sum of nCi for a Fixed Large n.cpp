@@ -592,6 +592,7 @@ int binomial_sum_mod_p(int N, int K, int mod) {
   return ret;
 }
 
+// credit: Min_25
 void solve() {
   const u32 p = u32(-1) >> 1; // 2^31
   printf("%d\n", binomial_sum_mod_p(2e9, 1e9, p));

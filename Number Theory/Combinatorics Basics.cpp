@@ -50,7 +50,7 @@ struct combi{
   inline mint fact(int n) { return facts[n]; }
   inline mint finv(int n) { return finvs[n]; }
   inline mint inv(int n) { return invs[n]; }
-  inline mint ncr(int n, int k) { return n < k ? 0 : facts[n] * finvs[k] * finvs[n-k]; }
+  inline mint ncr(int n, int k) { return n < k or k < 0 ? 0 : facts[n] * finvs[k] * finvs[n-k]; }
 };
 combi C(N);
 

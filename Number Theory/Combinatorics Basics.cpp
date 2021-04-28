@@ -2,7 +2,7 @@
 using namespace std;
 const int N = 3e5 + 9, mod = 1e9 + 7;
 
-template <int32_t MOD>
+template <const int32_t MOD>
 struct modint {
   int32_t value;
   modint() = default;
@@ -14,14 +14,7 @@ struct modint {
   inline modint<MOD> & operator -= (modint<MOD> other) { this->value -= other.value; if (this->value <    0) this->value += MOD; return *this; }
   inline modint<MOD> & operator *= (modint<MOD> other) { this->value = (int64_t)this->value * other.value % MOD; if (this->value < 0) this->value += MOD; return *this; }
   inline modint<MOD> operator - () const { return modint<MOD>(this->value ? MOD - this->value : 0); }
-  modint<MOD> pow(uint64_t k) const {
-    modint<MOD> x = *this, y = 1;
-    for (; k; k >>= 1) {
-      if (k & 1) y *= x;
-      x *= x;
-    }
-    return y;
-  }
+  modint<MOD> pow(uint64_t k) const { modint<MOD> x = *this, y = 1; for (; k; k >>= 1) { if (k & 1) y *= x; x *= x; } return y; }
   modint<MOD> inv() const { return pow(MOD - 2); }  // MOD must be a prime
   inline modint<MOD> operator /  (modint<MOD> other) const { return *this *  other.inv(); }
   inline modint<MOD> operator /= (modint<MOD> other)       { return *this *= other.inv(); }
@@ -32,6 +25,7 @@ struct modint {
 };
 template <int32_t MOD> modint<MOD> operator * (int64_t value, modint<MOD> n) { return modint<MOD>(value) * n; }
 template <int32_t MOD> modint<MOD> operator * (int32_t value, modint<MOD> n) { return modint<MOD>(value % MOD) * n; }
+template <int32_t MOD> istream & operator >> (istream & in, modint<MOD> &n) { return in >> n.value; }
 template <int32_t MOD> ostream & operator << (ostream & out, modint<MOD> n) { return out << n.value; }
 
 using mint = modint<mod>;

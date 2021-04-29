@@ -31,12 +31,13 @@ int primitive_root(int p) {
   return -1;
 }
 // returns any or all numbers x such that x ^ k = a (mod m)
-// m is prime
-// existence: a = 0 is trivial, and if a > 0: a ^ ((m - 1) / gcd(k, m - 1)) == 1 mod m
+// existence: a = 0 is trivial, and if a > 0: a ^ (phi(m) / gcd(k, phi(m))) == 1 mod m
+// if solution exists, then number of solutions = gcd(k, phi(m)).
+// here m is prime, but it will work for any integer which has a primitive root
 int discrete_root(int k, int a, int m) {
   if (a == 0) return 1;
   int g = primitive_root(m);
-  int phi = m - 1;
+  int phi = m - 1; // m is prime
   // run baby step-giant step
   int sq = (int) sqrt (m + .0) + 1;
   vector<pair<int,int>> dec (sq);
@@ -56,11 +57,12 @@ int discrete_root(int k, int a, int m) {
   int delta = (m - 1) / __gcd (k, m - 1);
   return power (g, any_ans % delta, m);
 
-  // for all possible answers
+  // // for all possible answers
   // int delta = (m - 1) / __gcd(k, m - 1);
   // vector<int> ans;
   // for (int cur = any_ans % delta; cur < m-1; cur += delta) ans.push_back(power(g, cur, m));
   // sort(ans.begin(), ans.end());
+  // // assert(ans.size() == __gcd(k, m - 1))
   // return ans;
 }
 int32_t main() {

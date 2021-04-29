@@ -25,6 +25,7 @@ ll totient(ll n) {
 // returns the minimum positive k s.t. a^ k = 1 modulo mod. On failure, returns -1
 // we just have to check the divisors of phi(mod) as candidates of k (Lagranges Theorem)
 // which can still be optimized further. Check: https://cp-algorithms.com/algebra/primitive-root.html#toc-tgt-3
+// it always exists if a and mod are coprime
 // O((log(mod)^2)) + sqrt(mod) for calculating totient
 ll multiplicative_order(ll a, ll mod) {
   if (__gcd(a, mod) != 1) return -1;
@@ -41,7 +42,7 @@ ll multiplicative_order(ll a, ll mod) {
   for (auto x: fac) {
     if (power(a, p / x, mod) == 1) p /= x, ans = p;
   }
-  if (ans == 2e18) ans = -1;
+  assert(ans != 2e18);
   return ans;
 }
 

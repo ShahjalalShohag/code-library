@@ -69,7 +69,7 @@ ll peth_root(ll a, ll p, int e, ll mod) {
   }
   return ans;
 }
-// Find any x such that x ^ k  =  a (mod p),  p is a prime
+// returns any x such that x ^ k  =  a (mod p),  p is a prime
 // 0^0 = 1 mod p
 // Complexity: O(p ^ (1 / 4))
 ll discrete_root(ll k, ll a, ll p) {

@@ -24,7 +24,7 @@ int power(int a, int b, int m) {
 // g is a primitive root modulo p if and only if for any integer a such that
 // gcd(a, p) = 1, there exists an integer k such that: g^k = a(mod p).
 // primitive root modulo n exists iff n = 1, 2, 4 or n = p^k or 2 * p^k for some odd prime p
-int PrimitiveRoot(int p) {
+int primitive_root(int p) {
   // first check if primitive root exists or not. I have omitted this part here
   vector<int> fact;
   int phi = totient(p),  n = phi;
@@ -47,7 +47,7 @@ int PrimitiveRoot(int p) {
 int32_t main() {
   ios_base::sync_with_stdio(0);
   cin.tie(0);
-  cout << PrimitiveRoot(200003) << '\n';
+  cout << primitive_root(200003) << '\n';
   return 0;
 }
 // https://cp-algorithms.com/algebra/primitive-root.html

@@ -32,6 +32,7 @@ int primitive_root(int p) {
 }
 // returns any or all numbers x such that x ^ k = a (mod m)
 // m is prime
+// existence: a = 0 is trivial, and if a > 0: a ^ ((m - 1) / gcd(k, m - 1)) == 1 mod m
 int discrete_root(int k, int a, int m) {
   if (a == 0) return 1;
   int g = primitive_root(m);

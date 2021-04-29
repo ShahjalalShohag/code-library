@@ -22,7 +22,7 @@ ll totient(ll n) {
   if (n > 1) ans = ans / n * (n - 1);
   return ans;
 }
-// returns the minimum k s.t. a^ k = 1 modulo mod. On failure, returns -1
+// returns the minimum positive k s.t. a^ k = 1 modulo mod. On failure, returns -1
 // we just have to check the divisors of phi(mod) as candidates of k (Lagranges Theorem)
 // which can still be optimized further. Check: https://cp-algorithms.com/algebra/primitive-root.html#toc-tgt-3
 // O((log(mod)^2)) + sqrt(mod) for calculating totient

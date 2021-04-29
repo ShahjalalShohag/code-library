@@ -27,6 +27,7 @@ ll totient(ll n) {
 // which can still be optimized further. Check: https://cp-algorithms.com/algebra/primitive-root.html#toc-tgt-3
 // O((log(mod)^2)) + sqrt(mod) for calculating totient
 ll multiplicative_order(ll a, ll mod) {
+  if (__gcd(a, mod) != 1) return -1;
   ll m = totient(mod), p = m;
   ll ans = 2e18;
   if (power(a, p, mod) == 1) ans = p;

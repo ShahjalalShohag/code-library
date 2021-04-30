@@ -12,6 +12,7 @@ struct LDE { // sum(a[i] * x[i]) = k, x[i] >= 0
     n = a.size();
     priority_queue<pair<ll, int>, vector<pair<ll, int>>, greater<pair<ll, int>>> q;
     x = *min_element(a.begin(), a.end());
+    assert(x > 0);
     d.resize(x);
     fill(d.begin(), d.end(), inf);
     d[0] = 0; q.push(pair<ll, int>(0, 0));

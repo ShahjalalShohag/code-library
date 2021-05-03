@@ -63,6 +63,7 @@ T count(T a, T b, T c, T n) {
 // number of solutions to ax + by + cz = n s.t. x, y, z >= 0
 // a, b, c >= 1
 // O(log(max(a, b, c)));
+// paper: https://cs.uwaterloo.ca/journals/JIS/VOL23/Binner/binner4.pdf
 T yo(T a, T b, T c, T n) {
   T g = __gcd(__gcd(a, b), c);
   if (n % g != 0) return 0;

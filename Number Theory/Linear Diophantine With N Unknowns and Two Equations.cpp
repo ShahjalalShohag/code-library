@@ -7,7 +7,7 @@ using ll = long long;
 given are a[i], b[i], p and q:
 sum(x[i] * a[i]) = p --- (i)
 sum(x[i] * b[i]) = q --- (ii)
-x[i]s can be integers.
+x[i]s can only be integers.
 
 does a solution exist?
 **/

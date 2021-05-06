@@ -83,7 +83,7 @@ inline T eval(int p, int k, ll pw) { // pw = p^k, pw <= n
   return ans * (ans - 1);
 }
 
-// no memorization needed
+// no memorization needed!
 // sum of f(i) s.t. spf[i] > primes[j]
 T yo(ll x, int j) {
   if (primes[j] >= x) return 0;
@@ -106,6 +106,10 @@ T yo(ll x, int j) {
   }
   return ans;
 }
+
+// Min_25: Say my name
+// Dirichlet: You're heisenberg
+// Min_25: You're goddamn right
 
 // sum of f(i) for 1 <= i <= n
 // pol is the polynomial representation of f(p)

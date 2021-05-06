@@ -27,14 +27,15 @@ ll totient(ll n) {
 // which can still be optimized further. Check: https://cp-algorithms.com/algebra/primitive-root.html#toc-tgt-3
 // it always exists if a and mod are coprime
 // O((log(mod)^2)) + sqrt(mod) for calculating totient
+// it can still be optimized. Check: https://brilliant.org/wiki/carmichaels-lambda-function/
 ll multiplicative_order(ll a, ll mod) {
   if (__gcd(a, mod) != 1) return -1;
   ll m = totient(mod), p = m;
   ll ans = 2e18;
   if (power(a, p, mod) == 1) ans = p;
   vector<ll> fac;
-  for (ll i = 2 ; i * i <=m; i++) {
-    if (m % i ==0) {
+  for (ll i = 2 ; i * i <= m; i++) {
+    if (m % i == 0) {
       while(m % i == 0) m /= i, fac.push_back(i);
     }
   }

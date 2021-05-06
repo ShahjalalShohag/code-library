@@ -55,7 +55,7 @@ namespace pcf {
     int k = upper_bound(primes, primes + len, lim) - primes;
     return yo(n, k) + (k - 1);
   }
-  // runs under 0.5s for n = 1e12
+  // runs under 0.2s for n = 1e12
   long long Lehmer(long long n) {
     if (n < MAXN) return pref[n];
     long long w, res = 0;

@@ -89,6 +89,7 @@ ll power(ll n, int k) {
 }
 vector<int> d[M];
 // returns the count of numbers <= n s.t. each has exactly k divisors and isn't divisible by the first 'last' primes
+// pretty fast!
 ll backtrack(ll n, int k, int last = 0) {
   if (k >= M) return 0;
   if (n <= 0) return 0;

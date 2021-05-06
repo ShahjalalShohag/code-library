@@ -5,8 +5,8 @@ const int N = 3e5 + 9;
 
 namespace pcf {
   // initialize once by calling init()
-  #define MAXN 10000010 // initial sieve limit
-  #define MAX_PRIMES 1000010 // max size of the prime array for sieve
+  #define MAXN 20000010 // initial sieve limit
+  #define MAX_PRIMES 2000010 // max size of the prime array for sieve
   #define PHI_N 100000
   #define PHI_K 100
 
@@ -48,24 +48,24 @@ namespace pcf {
     if (primes[k - 1] >= n) return 1;
     return yo(n, k - 1) - yo(n / primes[k - 1], k - 1);
   }
+  // complexity: n^(2/3).(log n^(1/3))
   long long Legendre(long long n) {
     if (n < MAXN) return pref[n];
     int lim = sqrt(n) + 1;
     int k = upper_bound(primes, primes + len, lim) - primes;
     return yo(n, k) + (k - 1);
   }
-  // complexity: n^(2/3).(log n^(1/3))
+  // runs under 0.5s for n = 1e12
   long long Lehmer(long long n) {
     if (n < MAXN) return pref[n];
     long long w, res = 0;
-    int i, j, a, b, c, lim;
-    b = sqrt(n), c = Lehmer(cbrt(n)), a = Lehmer(sqrt(b)), b = Lehmer(b);
-    res = yo(n, a) + (((b + a - 2) * (b - a + 1)) >> 1);
-    for (i = a; i < b; i++) {
+    int b = sqrt(n), c = Lehmer(cbrt(n)), a = Lehmer(sqrt(b)); b = Lehmer(b);
+    res = yo(n, a) + ((1LL * (b + a - 2) * (b - a + 1)) >> 1);
+    for (int i = a; i < b; i++) {
       w = n / primes[i];
-      lim = Lehmer(sqrt(w)), res -= Lehmer(w);
+      int lim = Lehmer(sqrt(w)); res -= Lehmer(w);
       if (i <= c) {
-        for (j = i; j < lim; j++) {
+        for (int j = i; j < lim; j++) {
           res += j;
           res -= Lehmer(w / primes[j]);
         }

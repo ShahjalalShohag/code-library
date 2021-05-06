@@ -26,7 +26,7 @@ void sieve() {
 double lgp[N];
 vector<long long> v;
 unordered_map<long long, pair<double, int>> dp[100];
-pair<double, int> yo(int i, long long n) {
+pair<double, int> yo(int i, long long n) { // it solves for odd divisors
   if (n == 1) {
     return {0, 1};
   }

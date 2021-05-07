@@ -50,7 +50,7 @@ struct Combi{
 Combi C(N);
 
 // returns the number of solutions to the equation
-// x_1 + x_2 + ... + x_n <= s and 0 <= l <= x_i <= r
+// x_1 + x_2 + ... + x_n = s and 0 <= l <= x_i <= r
 mint yo(int n, int s, int l, int r) { 
   if (s < l * n) return 0;
   s -= l * n;

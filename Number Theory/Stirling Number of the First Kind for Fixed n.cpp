@@ -82,6 +82,7 @@ vector<int> range_mul(int n) {
     return multiply(f, tmp);
   }
 }
+// returns stirling1st(n, i) for 0 <= i <= n
 vector<int> stirling(int n) {
   if (n == 0) return {1};
   vector<int> ans = range_mul(n - 1);

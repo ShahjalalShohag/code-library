@@ -28,13 +28,16 @@ pair<ll, ll> approximate(ld x, ll n) {
     LQ = Q; Q = NQ;
   }
 }
-
 int32_t main() {
   ios_base::sync_with_stdio(0);
   cin.tie(0);
-  double q = 3232.45622121;
-  ll n = 701443;
-  auto ans = approximate(q, n);
-  cout << ans.first << ' ' << ans.second;
+  int t; cin >> t;
+  while (t--) {
+    long double x; cin >> x;
+    ll n = 1e9;
+    auto ans = approximate(x, n);
+    cout << ans.first << ' ' << ans.second << '\n';
+  }
   return 0;
 }
+// https://official.contest.yandex.ru/opencupXVIII/contest/5457/problems/E/?success=51368253#7/2017_10_14/fqGQVSrCf7

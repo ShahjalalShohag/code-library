@@ -4,6 +4,7 @@ using namespace std;
 using ll = long long;
 
 // number of integer solutions to ax + by <= c s.t. x, y >= 0
+// number of nonnegative integer lattice points under or on the line ax + by = c
 ll lattice_cnt(ll a, ll b, ll c) {
   assert(a >= 0 && b >= 0);
   if (c < 0) return 0;

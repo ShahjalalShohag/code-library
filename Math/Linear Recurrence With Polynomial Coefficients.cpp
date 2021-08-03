@@ -161,6 +161,9 @@ void show_extended_sequence(int n, const vector<int>& terms, int degree, int mod
   puts("");
 }
 
+// transition -> for(i = 0; i < k; i++) f[n] += tr[i] * f[n-i-1]
+// here tr[i] is a polynomial. order = k and degree = degree of tr[i]
+// given first few values of f, it will extract the recurrence
 int main() {
   const int mod = 1e9 + 7;
 

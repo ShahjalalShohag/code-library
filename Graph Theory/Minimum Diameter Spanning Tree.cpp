@@ -1,57 +1,87 @@
-#include<bits/stdc++.h>
+#include <bits/stdc++.h>
 using namespace std;
+typedef long long ll;
 
-const int N = 220;
+const int N = 505;
+const int M = 200010;
+const ll INF = 1e18 + 5;
 
-const long long inf = 1e18;
-long long d[N][N], n, m;
-vector<array<int, 3>> ed;
+ll d[N][N], W[M];
+vector <int> g[N];
+int n, m, U[M], V[M], id[N], par[N];
+ll ed, far, global = LLONG_MAX, dist[N];
 
-void APSP()
-{
-    for(int i = 1; i <= n; i++) for(int j = 1; j <= n; j++) d[i][j] = i == j ? 0 : inf;
-    for(int i = 0; i < m; i++){
-        int u = ed[i][0], v = ed[i][1], w = ed[i][2];
-        d[u][v] = d[v][u] = min(d[u][v], w * 2LL); //calculate shortest path using double weights
-    }
-    for(int k = 1; k <= n; k++) for(int i = 1; i <= n; i++) for(int j = 1; j <= n; j++) d[i][j] = min(d[i][j], d[i][k] + d[k][j]);
-}
-
-//O(n * m)
-long long MDST()
-{
-    if(n == 1) return 0;
-    APSP();
-    long long ans = inf;
-    for(auto p : ed){
-        int u = p[0], v = p[1], w= p[2];
-        vector<pair<long long, long long>> a;
-        for(int i = 1; i <= n; i++) a.push_back({d[u][i], d[v][i]});
-        sort(a.begin(), a.end());
-        reverse(a.begin(), a.end());
-        pair<long long, long long> cur = a[0];
-        long long nw = cur.first;
-        for(int i = 1; i < n; i++){
-            if(a[i].second > cur.second){
-                nw = min(nw, (w * 2+ cur.second + a[i].first) / 2);
-                cur = a[i];
-            }
-        }
-        nw = min(nw, cur.second);
-        ans = min(ans, nw);
-    }
-    return ans;
-}
-
-int32_t main()
-{
-    cin >> n >> m;
-    for(int i = 1; i <= m; i++){
-        int u, v, w; cin >> u >> v >> w;
-        ed.push_back({u, v, w});
-    }
-    long long ans = MDST();
-    cout << fixed << setprecision(2) << ans / 2.0 << '\n';
+int main() {
+  cin >> n >> m;
+  memset(d, 63, sizeof d);
+  for (int i = 1; i <= n; ++i) {
+    d[i][i] = 0, id[i] = par[i] = i;
+  }
+  for (int i = 1; i <= m; ++i) {
+    scanf("%d %d %lld", U + i, V + i, W + i);
+    if (U[i] > V[i]) swap(U[i], V[i]);
+    W[i] <<= 1LL; // double the weight
+    int u = U[i], v = V[i]; ll w = W[i];
+    d[u][v] = min(d[u][v], w);
+    d[v][u] = min(d[v][u], w);
+    g[u].emplace_back(i), g[v].emplace_back(i);
+  }
+  if (n == 1) {
+    cout << 0 << '\n';
     return 0;
+  }
+  for (int k = 1; k <= n; ++k) {
+    for (int i = 1; i <= n; ++i) {
+      for (int j = 1; j <= n; ++j) {
+        d[i][j] = min(d[i][j], d[i][k] + d[k][j]);
+      }
+    }
+  }
+  for (int u = 1; u <= n; ++u) {
+    sort(id + 1, id + n + 1, [&] (int i, int j) {return d[u][i] > d[u][j];});
+    for (int e : g[u]) {
+      int v = U[e] ^ u ^ V[e]; ll w = W[e];
+      if (v < u) continue; 
+      int last = id[1];
+      ll opt = 0, minVal = d[u][last];
+      for (int it = 2; it <= n; ++it) {
+        int i = id[it];
+        if (d[v][i] <= d[v][last]) continue; 
+        ll curX = (w - d[u][i] + d[v][last]) / 2;
+        ll curY = (w + d[u][i] + d[v][last]) / 2;
+        if (minVal > curY) minVal = curY, opt = curX; 
+        last = i;
+      }
+      if (minVal > d[v][last]) minVal = d[v][last], opt = w;
+      if (minVal < global) global = minVal, ed = e, far = opt;
+    }
+  }
+  printf("%lld\n", global);
+  // lets extract the tree
+  ++n;
+  ++m, U[m] = U[ed], V[m] = n, W[m] = far;
+  g[U[m]].emplace_back(m), g[V[m]].emplace_back(m);
+  ++m, U[m] = V[ed], V[m] = n, W[m] = W[ed] - far; 
+  g[U[m]].emplace_back(m), g[V[m]].emplace_back(m);
+  priority_queue <pair <ll, int>> pq;
+  pq.emplace(0, n);
+  for (int i = 1; i < n; ++i) dist[i] = INF;
+  while (!pq.empty()) {
+    int u = pq.top().second; pq.pop();
+    for (int e : g[u]) if (e ^ ed) {
+      int v = U[e] ^ u ^ V[e]; ll w = W[e];
+      if (dist[v] > dist[u] + w) {
+        dist[v] = dist[u] + w, par[v] = u, pq.emplace(-dist[v], v);
+      }
+    }
+  }
+  if (U[ed] > V[ed]) swap(U[ed], V[ed]);
+  printf("%d %d\n", U[ed], V[ed]);
+  for (int i = 1; i < n; ++i) if (par[i] ^ n) {
+    int u = i, v = par[i];
+    if (u > v) swap(u, v); 
+    printf("%d %d\n", u, v);
+  }
+  return 0;
 }
-//https://codeforces.com/contest/266/problem/D
+// https://www.spoj.com/problems/PT07C/

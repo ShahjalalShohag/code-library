@@ -3,6 +3,7 @@ using namespace std;
 
 const int N = 1e5 + 9;
 
+//credit: Alpha_Q
 struct AC {
   int N, P;
   const int A = 26;

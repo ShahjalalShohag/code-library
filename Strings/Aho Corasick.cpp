@@ -1,101 +1,97 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-#define pii pair<int,int>
-#define pll pair<ll,ll>
-#define eb emplace_back
-#define ll long long
-#define nl '\n'
-#define deb(x) cerr<<#x" = "<<x<<nl
-#define in() ( { int a ; scanf("%d",&a); a; } )
+const int N = 1e5 + 9;
 
-const int N = 3e5 + 9;
-const int mod = 1e9 + 7;
-
-struct aho_corasick
-{
-	bool is_end[N];
-	int link[N]; ///link to the longest proper suffix
-    int sz;
-	map<char, int> to[N], dp[N];
-    int cnt[N], path[N], ind[N], len; ///for number of occurrences
-	void clear()
-	{
-		for(int i = 0; i < sz; i++)
-			is_end[i] = 0,cnt[i]=0,path[i]=0, ind[i]=0,link[i] = 0, to[i].clear(), dp[i].clear();
-		sz = 1;
-		is_end[0] = 1;
-		len=0;
-	}
-	aho_corasick() { sz = N - 2; clear(); }
-	void add_word(string &s, int idx)
-	{
-		int u = 0;
-		for(char c: s)
-		{
-			if(!to[u].count(c)) to[u][c] = sz++;
-			u = to[u][c];
-		}
-		is_end[u] = 1;
-		ind[idx]=u;
-	}
-	void push_links()
-	{
-		queue<int> q;
-		int u, v, j;
-		char c;
-		q.push(0);///root
-		link[0] = -1;
-		while(!q.empty())
-		{
-			u = q.front();
-			q.pop();
-			for(auto it: to[u])
-			{
-				v = it.second;
-				c = it.first;
-				j = link[u];
-				while(j != -1 && !to[j].count(c)) j = link[j];
-				if(j != -1) link[v] = to[j][c];
-				else link[v] = 0;
-				q.push(v);
-				path[len++]=v;
-			}
-		}
-	}
-	///go to the state if we add the character ch
-	int go(int v, char ch) {
-        if (!dp[v].count(ch)) {
-            if (to[v].count(ch)) return dp[v][ch]= to[v][ch];
-            return dp[v][ch] = (v == 0 ? 0 : go(link[v], ch));
+struct AC {
+  int N, P;
+  const int A = 26;
+  vector <vector <int>> next;
+  vector <int> link, out_link;
+  vector <vector <int>> out;
+  AC(): N(0), P(0) {node();}
+  int node() {
+    next.emplace_back(A, 0);
+    link.emplace_back(0);
+    out_link.emplace_back(0);
+    out.emplace_back(0);
+    return N++;
+  }
+  inline int get (char c) {
+    return c - 'a';
+  }
+  int add_pattern (const string T) {
+    int u = 0;
+    for (auto c : T) {
+      if (!next[u][get(c)]) next[u][get(c)] = node();
+      u = next[u][get(c)];
+    }
+    out[u].push_back(P);
+    return P++;
+  }
+  void compute() {
+    queue <int> q;
+    for (q.push(0); !q.empty();) {
+      int u = q.front(); q.pop();
+      for (int c = 0; c < A; ++c) {
+        int v = next[u][c];
+        if (!v) next[u][c] = next[link[u]][c];
+        else {
+          link[v] = u ? next[link[u]][c] : 0;
+          out_link[v] = out[link[v]].empty() ? out_link[link[v]] : link[v];
+          q.push(v);
         }
-        return dp[v][ch];
+      }
     }
-	void traverse(string &s)
-    {
-        int n = s.size();
-        int cur = 0;
-        for(int i=0; i<n; i++){
-            cur = go(cur, s[i]);
-            cnt[cur]++;
-        }
-        for(int i=len-1; i>=0; i--) cnt[link[path[i]]] += cnt[path[i]];
-    }
-}t;
+  }
+  int advance (int u, char c) {
+    while (u && !next[u][get(c)]) u = link[u];
+    u = next[u][get(c)];
+    return u;
+  }
+};
 
-string p[N];
-int32_t main()
-{
-	int i,j,k,n,q;
-	string s; cin>>s;
-	cin>>q;
-    for(i=0;i<q;i++){
-        cin>>p[i];
-        t.add_word(p[i],i);
+int32_t main() {
+  ios_base::sync_with_stdio(0);
+  cin.tie(0);
+  auto st = clock();
+  int t, cs = 0; cin >> t;
+  while (t--) {
+    int n; cin >> n;
+    vector<string> v;
+    for (int i = 0; i < n; i++) {
+      string s; cin >> s;
+      v.push_back(s);
     }
-    t.push_links();
-    t.traverse(s);
-    ///print the number of occurrences
-    for(i=0;i<q;i++) cout<<t.cnt[t.ind[i]]<<nl;
-	return 0;
+    sort(v.begin(), v.end());
+    v.erase(unique(v.begin(), v.end()), v.end());
+    AC aho;
+    vector<int> len(n + 3, 0);
+    for (auto s: v) {
+      len[aho.add_pattern(s)] = s.size();
+    }
+    aho.compute();
+    string s; cin >> s;
+    n = s.size();
+    vector<int> dp(n, n + 10);
+    int u = 0;
+    for (int i = 0; i < n; i++) {
+      char c = s[i];
+      u = aho.advance(u, c);
+      for (int v = u; v; v = aho.out_link[v]) {
+        for (auto p : aho.out[v]) { 
+          dp[i] = min(dp[i], (i - len[p] >= 0 ? dp[i - len[p]] : 0) + 1);
+        }
+      }
+    }
+    cout << "Case " << ++cs << ": ";
+    if (dp[n - 1] == n + 10) {
+      cout << "impossible\n";
+    }
+    else {
+      cout << dp[n - 1] << '\n';
+    }
+  }
+  cout << 1.0 * (clock() - st) / 1000 << '\n';
+  return 0;
 }

@@ -106,3 +106,4 @@ int32_t main() {
   for(int i = 1; i <= n; i++) cout << ans[i] << " \n"[i == n];
   return 0;
 }
+// https://codeforces.com/problemset/problem/911/G

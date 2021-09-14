@@ -1,110 +1,138 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-const int N = 1e5 + 9, LG = 16;
+const int N = 1e5 + 9;
 
-vector<pair<int, int>> g[N];
+const double PI = acos(-1);
+struct base {
+  double a, b;
+  base(double a = 0, double b = 0) : a(a), b(b) {}
+  const base operator + (const base &c) const {
+    return base(a + c.a, b + c.b);
+  }
+  const base operator - (const base &c) const {
+    return base(a - c.a, b - c.b);
+  }
+  const base operator * (const base &c) const {
+    return base(a * c.a - b * c.b, a * c.b + b * c.a);
+  }
+};
+void fft(vector<base> &p, bool inv = 0) {
+  int n = p.size(), i = 0;
+  for(int j = 1; j < n - 1; ++j) {
+    for(int k = n  >>  1; k > (i ^= k); k  >>= 1);
+    if(j < i) swap(p[i], p[j]);
+  }
+  for(int l = 1, m; (m = l << 1) <= n; l <<= 1) {
+    double ang = 2 * PI / m;
+    base wn = base(cos(ang), (inv ? 1. : -1.) * sin(ang)), w;
+    for(int i = 0, j, k; i < n; i += m) {
+      for(w = base(1, 0), j = i, k = i + l; j < k; ++j, w = w * wn) {
+        base t = w * p[j + l];
+        p[j + l] = p[j] - t;
+        p[j] = p[j] + t;
+      }
+    }
+  }
+  if(inv) for(int i = 0; i < n; ++i) p[i].a /= n, p[i].b /= n;
+}
+vector<long long> multiply(vector<int> &a, vector<int> &b) {
+  int n = a.size(), m = b.size(), t = n + m - 1, sz = 1;
+  while(sz < t) sz <<= 1;
+  vector<base> x(sz), y(sz), z(sz);
+  for(int i = 0 ; i < sz; ++i) {
+    x[i] = i < (int)a.size() ? base(a[i], 0) : base(0, 0);
+    y[i] = i < (int)b.size() ? base(b[i], 0) : base(0, 0);
+  }
+  fft(x), fft(y);
+  for(int i = 0; i < sz; ++i) z[i] = x[i] * y[i];
+  fft(z, 1);
+  vector<long long> ret(sz);
+  for(int i = 0; i < sz; ++i) ret[i] = z[i].a + 0.5;
+  while((int)ret.size() > 1 && ret.back() == 0) ret.pop_back();
+  return ret;
+}
+
+vector<int> g[N];
 int sz[N];
 int tot, done[N], cenpar[N];
 void calc_sz(int u, int p) {
-    tot ++; sz[u] = 1;
-    for (auto e: g[u]) {
-    	int v = e.first;
-        if(v == p || done[v]) continue;
-        calc_sz(v, u);
-        sz[u] += sz[v];
-    }
+  tot ++;
+  sz[u] = 1;
+  for (auto v : g[u]) {
+    if(v == p || done[v]) continue;
+    calc_sz(v, u);
+    sz[u] += sz[v];
+  }
 }
 int find_cen(int u, int p) {
-    for (auto e: g[u]) {
-        int v = e.first;
-        if(v == p || done[v]) continue;
-        else if(sz[v] > tot / 2) return find_cen(v, u);
-    }
-    return u;
+  for (auto v : g[u]) {
+    if(v == p || done[v]) continue;
+    else if(sz[v] > tot / 2) return find_cen(v, u);
+  }
+  return u;
 }
-pair<long long, long long> extendedEuclid(long long a, long long b) { // returns x, y | ax + by = gcd(a,b)
-    if(b == 0) return pair<long long, long long>(a>=0?1LL:-1LL , 0LL);
-    else {
-        pair<long long, long long> d = extendedEuclid(b, a % b);
-        return pair<long long, long long>(d.second, d.first - d.second * (a / b));
-    }
-
+vector<int> vec;
+void dfs(int u, int pre, int len) {
+  vec.push_back(len);
+  for(auto v : g[u]) {
+    if(v == pre || done[v]) continue;
+    dfs(v, u, len + 1);
+  }
 }
-long long inv(long long a, long long n) {///a and n is coprime
-    pair<long long, long long> ret = extendedEuclid(a, n);
-    return ((ret.first % n) + n) % n;
+long long ans[N]; // number of paths of length i = ans[i]
+void solve(int u, int pre, int len, int add) {
+  vec.clear();
+  dfs(u, pre, len);
+  int mx = 0;
+  for(auto x : vec) mx = max(mx, x);
+  vector<int> a(mx + 1, 0);
+  for(auto x : vec) a[x]++;
+  vector<long long> res = multiply(a, a);
+  for(int i = 0; i < res.size(); i++) ans[i] += res[i] * add;
 }
-int pw[N], invpw[N], mod;
-map<int, int> mp;
-void add(int u, int p, int dep, int down, int up) {
-    mp[up]++;
-    for (auto e: g[u]) {
-        int v = e.first, w = e.second;
-        if(v == p || done[v]) continue;
-        int D = (1LL * down * 10 % mod + w) % mod;
-        int U = (1LL * w * pw[dep] % mod + up) % mod;
-        add(v, u, dep + 1, D, U);
-    }
+void decompose(int u, int pre) {
+  tot = 0;
+  calc_sz(u, pre);
+  int cen = find_cen(u, pre);
+  cenpar[cen] = pre;
+  done[cen] = 1;
+  solve(cen, pre, 0, 1);
+  for(auto v : g[cen]) {
+    if(v == pre || done[v]) continue;
+    solve(v, cen, 1, -1);
+  }
+  for(auto v : g[cen]) {
+    if(v == pre || done[v]) continue;
+    decompose(v, cen);
+  }
 }
-long long ans, extra;
-void yo(int u, int p, int dep, int down, int up) {
-    int x = (-1LL * down * invpw[dep] % mod + mod) % mod;
-    if(mp.find(x) != mp.end()) ans += mp[x];
-    extra += up == 0;
-    extra += down == 0;
-    for (auto e: g[u]) {
-        int v = e.first, w = e.second;
-        if(v == p || done[v]) continue;
-        int D = (1LL * down * 10 % mod + w) % mod;
-        int U = (1LL * w * pw[dep] % mod + up) % mod;
-        yo(v, u, dep + 1, D, U);
-    }
-}
-void decompose(int u, int p  = 0) {
-    tot = 0;
-    calc_sz(u, p);
-    int cen = find_cen(u, p);
-    cenpar[cen] = p;
-    done[cen] = 1;
-    mp.clear();
-    extra = 0;
-    for (auto e: g[cen]) {
-        int v = e.first, w = e.second;
-        if(v == p || done[v]) continue;
-        yo(v, cen, 1, w, w);
-        add(v, cen, 1, w, w);
-    } 
-    ans += extra;
-    mp.clear();
-    reverse(g[cen].begin(), g[cen].end()); 
-    for (auto e: g[cen]) {
-        int v = e.first, w = e.second;
-        if(v == p || done[v]) continue;
-        yo(v, cen, 1, w, w);
-        add(v, cen, 1, w, w);
-    }
-    reverse(g[cen].begin(), g[cen].end());
-    for (auto e: g[cen]) {
-        int v = e.first;
-        if(v == p || done[v]) continue;
-        decompose(v, cen);
-    }
-}
-int32_t main() {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0);
-    int n; cin >> n >> mod;
-    pw[0] = 1;
-    for (int i = 1; i < N; i++) pw[i] = 1LL * pw[i - 1] * 10 % mod;
-    for (int i = 0; i < N; i++) invpw[i] = inv(pw[i], mod);
+int main() {
+  freopen("awesome.in", "r", stdin);
+  ios_base::sync_with_stdio(0);
+  cin.tie(0);
+  int t;
+  cin >> t;
+  while (t--) {
+    int n, l, r;
+    cin >> n >> l >> r;
+    l = n - 1 - l;
+    r = n - 1 - r;
+    swap(l, r);
     for (int i = 1; i < n; i++) {
-        int u, v, w; cin >> u >> v >> w; u++, v++;
-        g[u].push_back({v, w % mod});
-        g[v].push_back({u, w % mod});
+      int u, v;
+      cin >> u >> v;
+      g[u].push_back(v);
+      g[v].push_back(u);
     }
-    decompose(1);
-    cout << ans << '\n';
-    return 0;
+    decompose(1, 0);
+    ans[0] = 0;
+    long long res = 0;
+    for(int i = l; i <= r; i++) res += ans[i] / 2;
+    cout << res << '\n';
+    for (int i = 1; i <= n; i++) g[i].clear(), done[i] = 0;
+    for (int i = 0; i < n; i++) ans[i] = 0;
+  }
+  return 0;
 }
-//https://codeforces.com/problemset/problem/715/C
+// https://codeforces.com/gym/101991/problem/A

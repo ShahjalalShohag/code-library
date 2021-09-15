@@ -3,6 +3,7 @@ using namespace std;
 
 const int N = 3e5 + 9;
 
+// credit: chemthan
 typedef set<pair<int, int> >::iterator iter;
 struct PT {
     int x, y;

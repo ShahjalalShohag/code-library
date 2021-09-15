@@ -1,1 +1,1 @@
-- I almost always use 1-indexing and inclusive ranges unless mentioned otherwise. That means wherever I have used 0-indexing or exclusive ranges I have commented them out explicitly.
+1. I almost always use 1-indexing and inclusive ranges unless mentioned otherwise. That means wherever I have used 0-indexing or exclusive ranges I have commented them out explicitly.

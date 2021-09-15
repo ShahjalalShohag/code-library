@@ -1,8 +1,8 @@
 #include<bits/stdc++.h>
 using namespace std;
-
+ 
 const int N = 2e5 + 9;
-
+ 
 struct DSU {
   vector<int> par, sz, w;
   vector<array<int, 3>> op;
@@ -75,8 +75,14 @@ struct update {
 struct DSUQueue {
   DSU D;
   vector<update> S;
+  int bottom;
   DSUQueue(int n) {
     D = DSU(n);
+    bottom = 0;
+  }
+  void advance_bottom() {
+    while (bottom < S.size() && S[bottom].type == 0)
+      bottom++;
   }
   void push(update u) {
     D.merge(u.x, u.y);
@@ -85,22 +91,28 @@ struct DSUQueue {
   void pop() {
     assert(!S.empty());
     vector<update> t[2];
-    do {
-      t[S.back().type].push_back(S.back());
-      S.pop_back();
-      D.undo();
-    } while (t[1].size() < t[0].size() && !S.empty());
-    if (t[1].empty()) {
+    advance_bottom();
+    if (bottom == S.size()) {
+      while (!S.empty()) {
+        t[0].push_back(S.back());
+        S.pop_back();
+        D.undo();
+      }
       for (auto &u : t[0]) {
         u.type = 1;
         push(u);
       }
-    } 
-    else {
-      for (int i : {0, 1}) {
-        reverse(t[i].begin(), t[i].end());
-        for (auto &u : t[i]) push(u);
-      }
+      t[0].clear();
+      bottom = 0;
+    }
+    do {
+      t[S.back().type].push_back(S.back());
+      S.pop_back();
+      D.undo();
+    } while (t[1].size() < t[0].size() && S.size() > bottom);
+    for (int i : {0, 1}) {
+      reverse(t[i].begin(), t[i].end());
+      for (auto &u : t[i]) push(u);
     }
     S.pop_back();
     D.undo();

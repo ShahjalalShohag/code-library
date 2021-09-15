@@ -7,6 +7,6 @@ It took me around 4 years to complete the list. Maybe each line is just a line t
 
 #### Why am I sharing this library? 
 - Just so that your learning path becomes a bit smoother. 
-- Knowledge hidden inside my head or codes in a private code-library will vanish when I am dead, so its better to share those among people before I die.
+- Knowledge hidden inside my head or codes in a private code-library will be useless when I am dead, so its better to share those among people before I die.
 
 I believe that my coding style is pretty clean and furthermore a few problem links are attached to most of the codes so that you can practice those problems. Best wishes, my friend <a href="https://emoji.gg/emoji/8771_blobheart"><img src="https://emoji.gg/assets/emoji/8771_blobheart.png" width="16px" height="16px" alt="blobheart"></a>.

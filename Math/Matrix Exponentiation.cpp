@@ -7,8 +7,8 @@ struct Mat {
   int n, m;
   vector<vector<int>> a;
   Mat() { }
-  Mat(int _n, int _m) {n = _n; m = _m; a.assign(n, vector<int>(m, 0)); }
-  Mat(vector< vector<int> > v) { n = v.size(); m = n ? v[0].size() : 0; a = v; }
+  Mat(int _n, int _m) : n(_n), m(_m), a(vector<vector<int>>(n, vector<int>(m, 0))) { }
+  Mat(vector< vector<int> > v) : n(v.size()), m(n ? v[0].size() : 0), a(v) { }
   inline void make_unit() {
     assert(n == m);
     for (int i = 0; i < n; i++)  {

@@ -101,7 +101,7 @@ struct line {
         return {a, b, c};
     }
     // 1 if on the left, -1 if on the right, 0 if on the line
-    int side(PT p) { return sign(cross(v, p) - c); }
+    bool side(PT p) { return sign(cross(v, p) - c); }
     // line that is perpendicular to this and goes through point p
     line perpendicular_through(PT p) { return {p, p + perp(v)}; }
     // translate the line by vector t i.e. shifting it by vector t

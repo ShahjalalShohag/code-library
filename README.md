@@ -9,3 +9,6 @@ It took me around 4 years to complete the list. Maybe each line is just a line t
 Also, you can make me happy(as in to pay me) just by giving a star to the repository.
 
 I believe that my coding style is pretty clean and readable, and furthermore, a few problem links are attached to most of the codes so that you can practice those problems. Best wishes, my friend <a href="https://emoji.gg/emoji/8771_blobheart"><img src="https://emoji.gg/assets/emoji/8771_blobheart.png" width="16px" height="16px" alt="blobheart"></a>.
+
+### Topic List
+The topic lists for which I have created this library can be found [here](https://codeforces.com/blog/entry/95106). It also contains the relevant problems and tutorials of each topic. Upvote the attached blog if you think I have helped you somehow. 

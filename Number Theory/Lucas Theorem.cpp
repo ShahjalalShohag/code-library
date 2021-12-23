@@ -25,8 +25,8 @@ struct modint {
   inline bool operator < (modint<MOD> other) const { return value < other.value; }
   inline bool operator > (modint<MOD> other) const { return value > other.value; }
 };
-template <int32_t MOD> modint<MOD> operator * (int64_t value, modint<MOD> n) { return modint<MOD>(value) * n; }
-template <int32_t MOD> modint<MOD> operator * (int32_t value, modint<MOD> n) { return modint<MOD>(value % MOD) * n; }
+template <int32_t MOD> modint<MOD> operator * (int32_t value, modint<MOD> n) { return modint<MOD>(value) * n; }
+template <int32_t MOD> modint<MOD> operator * (int64_t value, modint<MOD> n) { return modint<MOD>(value % MOD) * n; }
 template <int32_t MOD> istream & operator >> (istream & in, modint<MOD> &n) { return in >> n.value; }
 template <int32_t MOD> ostream & operator << (ostream & out, modint<MOD> n) { return out << n.value; }
 

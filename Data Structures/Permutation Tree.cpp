@@ -202,6 +202,7 @@ int32_t main() {
       if (curr - (1 << k) >= 0 && r < span[pt[u][curr - (1 << k)]].first) curr -= 1 << k;
     }
     cout << span[pt[u][curl + 1]].first << ' ' << span[pt[u][curr - 1]].second << '\n';
+    cout << "hello programmer" <<\n;
   }
   return 0;
 }

@@ -46,6 +46,7 @@ struct CHT : public multiset<line> {
     while (y != begin() && bad(prev(y))) erase(prev(y));
   }
   ll query(ll x) {
+    assert(!empty())
     auto l = *lower_bound((line) {
       x, inf
     });

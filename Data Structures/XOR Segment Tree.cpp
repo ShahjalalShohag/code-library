@@ -3,9 +3,9 @@ using namespace std;
 
 const int N = 2e5 + 9;
 
-int a[N];
+using T = long long;
+T a[N];
 struct XORSegmentTree {
-  using T = long long;
   // the length of the array should be 2^LOG for some LOG
   vector<T> t[4 * N]; // O(LOG 2^LOG) memory
   T lazy[4 * N];
@@ -78,11 +78,11 @@ int32_t main() {
     int z = rnd() % n, add = rnd() % 100;
     t.upd(1, 0, n - 1, z, add);
     a[z] += add;
-    long long sum = 0;
+    T sum = 0;
     for (int i = l; i <= r; i++) {
       sum += a[i ^ x];
     }
-    long long res = t.query(1, 0, n - 1, l, r, x, k - 1);
+    T res = t.query(1, 0, n - 1, l, r, x, k - 1);
     cout << sum << ' ' << res << '\n';
     assert(sum == res);
   }

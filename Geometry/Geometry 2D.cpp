@@ -154,7 +154,7 @@ double dist_from_point_to_seg(PT a, PT b, PT c) {
     return dist(c, project_from_point_to_seg(a, b, c));
 }
 // 0 if not parallel, 1 if parallel, 2 if collinear
-bool is_parallel(PT a, PT b, PT c, PT d) {
+int is_parallel(PT a, PT b, PT c, PT d) {
     double k = fabs(cross(b - a, d - c));
     if (k < eps){
         if (fabs(cross(a - b, a - c)) < eps && fabs(cross(c - d, c - a)) < eps) return 2;

@@ -35,7 +35,9 @@ void ntt(vector<int> &a, int typ) {
     for (int i = 0; i < lim; ++i) a[i] = (long long) a[i] * inv_lim % mod;
   }
 }
-// max(n, m) * log(max(n * m));
+// a is of size n * n
+// b is of size m * m
+// max(n, m)^2 * log(max(n, m));
 Mat multiply(Mat a, Mat b) {
   int n = a.size(), m = b.size();
   int len = n + m - 1;
@@ -48,6 +50,7 @@ Mat multiply(Mat a, Mat b) {
   for (int i = 0; i < lim; i++) {
     b[i].resize(lim, 0);
   }
+  // convert rows to point value form
   for (int i = 0; i < lim; i++) {
     ntt(a[i], 1);
     ntt(b[i], 1);
@@ -59,16 +62,21 @@ Mat multiply(Mat a, Mat b) {
       col_a[i] = a[i][j];
       col_b[i] = b[i][j];
     }
+    // convert columns to point value form
     ntt(col_a, 1);
     ntt(col_b, 1);
+    // so everything is in point value form,
+    // so compute the product easily
     for (int i = 0; i < lim; i++) {
       col_a[i] = 1LL * col_a[i] * col_b[i] % mod;
     }
+    // inverse fft on columns
     ntt(col_a, 0);
     for (int i = 0; i < lim; i++) {
       a[i][j] = col_a[i];
     }
   }
+  // inverse fft on rows
   for (int i = 0; i < lim; i++) {
     ntt(a[i], 0);
   }
@@ -86,6 +94,7 @@ Mat multiply_brute(Mat a, Mat b) {
       for (int r = 0; r < m; r++) {
         for (int c = 0; c < m; c++) {
           ans[i + r][j + c] += 1LL * a[i][j] * b[r][c] % mod;
+          ans[i + r][j + c] %= mod;
         }
       }
     }
@@ -95,16 +104,16 @@ Mat multiply_brute(Mat a, Mat b) {
 int32_t main() {
   ios_base::sync_with_stdio(0);
   cin.tie(0);
-  int n = 100, m = 200;
+  int n = 30, m = 119;
   vector<vector<int>> a(n, vector<int>(n, 0)), b(m, vector<int>(m, 0));
   for (int i = 0; i < n; i++) {
     for (int j = 0; j < n; j++) {
-      a[i][j] = rand() % 100;
+      a[i][j] = 1LL * rand() * rand() % mod;
     }
   }
   for (int i = 0; i < m; i++) {
     for (int j = 0; j < m; j++) {
-      b[i][j] = rand() % 100;
+      b[i][j] = 1LL * rand() * rand() % mod;
     }
   }
   Mat brute = multiply_brute(a, b);

@@ -15,7 +15,7 @@ pair<int, int> closest_pair(vector<pair<int, int>> a) {
 	sort(p.begin(), p.end());
 	int l = 0, r = 2;
 	long long ans = dist2(p[0].x, p[1].x);
-	pair<int, int> ret = {0, 1};
+	pair<int, int> ret = {p[0].y, p[1].y};
 	while (r < n) {
 		while (l < r && 1LL * (p[r].x.x - p[l].x.x) * (p[r].x.x - p[l].x.x) >= ans) l++;
 		for (int i = l; i < r; i++) {

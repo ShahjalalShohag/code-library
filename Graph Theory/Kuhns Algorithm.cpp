@@ -63,7 +63,7 @@ void dfs2(int u) {
 }
 int idx[N];
 
-//number of edges which are not in all Maximum Matchings in a Bipartite Graph
+// Given a graph having perfect matching, find the number of edges which are not in all Maximum Matchings in a Bipartite Graph
 int32_t main() {
   ios_base::sync_with_stdio(0);
   cin.tie(0);

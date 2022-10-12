@@ -44,7 +44,7 @@ struct MCMF {
     g[v].push_back(e.size());
     e.push_back(edge(v, u, 0, -cost, -1));
     mxid = max(mxid, id);
-    if(!directed) add_edge(v, u, cap, cost, -1, true);
+    if(!directed) add_edge(v, u, cap, cost, id + N, true); // tracks the reverse edges for undirected graphs
   }
   bool dijkstra() {
     par.assign(n, -1);

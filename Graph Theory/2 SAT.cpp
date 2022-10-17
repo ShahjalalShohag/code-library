@@ -43,13 +43,17 @@ struct twosat {
     addOR(a, af, b, bf);
     addOR(a, !af, b, !bf);
   }
-  //add this type of condition->
-  //add(a,af,b,bf) means if a is af then b must need to be bf
-  void add(int a,bool af,int b,bool bf) {
+  void _add(int a,bool af,int b,bool bf) {
     a += a + (af ^ 1);
     b += b + (bf ^ 1);
     g[a].push_back(b);
     gt[b].push_back(a);
+  }
+  //add this type of condition->
+  //add(a,af,b,bf) means if a is af then b must need to be bf
+  void add(int a,bool af,int b,bool bf) {
+    _add(a, af, b, bf);
+    _add(b, !bf, a, !af);
   }
   void dfs1(int u) {
     vis[u] = true;

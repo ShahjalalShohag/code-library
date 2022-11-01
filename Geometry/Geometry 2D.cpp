@@ -1098,7 +1098,7 @@ double polygon_circle_intersection(vector<PT> &v, PT p, double r) {
         if (x < 0) ans -= area;
         else ans += area;
     }
-    return ans * 0.5;
+    return abs(ans);
 }
 // find a circle of radius r that contains as many points as possible
 // O(n^2 log n);

@@ -5,6 +5,8 @@ const int N = 1e5 + 9, LG = 16;
 using ll = long long;
 
 vector<array<int, 2>> g[N];
+// take the longest path from the root and do the same thing
+// recursively for the decomposed subtrees
 struct LongPathDecomposition{
   int n, par[N][LG + 1], child[N]; // the subtree of child contains the node having the max dep
   ll dep[N], mx_dep[N];
@@ -66,8 +68,10 @@ struct LongPathDecomposition{
     }
     return par[u][0];
   }
+  // max sum of the union of $path_cnt paths such that their union contains the node u
+  // so just take the longest 2 * path_cnt leaves
   ll query(int u, int path_cnt) {
-    int leaves = min(head_cnt, path_cnt * 2 - 1); // root is also a leaf
+    int leaves = min(head_cnt, path_cnt * 2 - 1); // considering root as a leaf for this problem
     if (leaves <= 0) return 0;
     if (pos[head[u]] < leaves) {
       return sum[leaves - 1];

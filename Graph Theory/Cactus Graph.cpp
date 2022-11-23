@@ -6,7 +6,7 @@ const int N = 2e5 + 9, LG = 18, mod = 998244353;
 // no multi-edge or self-loops
 // edge cactus: each edge is in at most one cycle
 // this also works for vertex cactus
-vector<array<int, 2>> g[N];
+vector<array<int, 2>> g[N]; // (node, edge_id)
 vector<int> ct[N]; // cactus tree
 int P[N];
 int vis[N];

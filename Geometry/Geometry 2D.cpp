@@ -1120,7 +1120,7 @@ double maximum_circle_cover(vector<PT> p, double r, circle &c) {
             if (st <= -PI) st += PI * 2;
             if (ed > PI) ed -= PI * 2;
             if (ed <= -PI) ed += PI * 2;
-            events.push_back({st, +1});
+            events.push_back({st - eps, +1}); // take care of precisions!
             events.push_back({ed, -1});
             if (st > ed) {
                 events.push_back({-PI, +1});

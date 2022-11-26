@@ -174,3 +174,5 @@ int32_t main() {
   }
   return 0;
 }
+// https://codeforces.com/problemset/problem/1603/F
+// https://atcoder.jp/contests/abc278/editorial/5238

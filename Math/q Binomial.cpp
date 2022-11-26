@@ -93,6 +93,8 @@ void prec() {
     q_inv_fac[i] = q_inv_fac[i + 1] * (pw[i + 1] - 1);
   }
 }
+
+// number of r dimensional subspaces of n dimensinal vector space
 mint q_binom(int n, int r) {
   if (n < r) return 0;
   return q_fac[n] * q_inv_fac[r] * q_inv_fac[n - r];

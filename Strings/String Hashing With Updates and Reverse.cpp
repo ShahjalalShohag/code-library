@@ -86,6 +86,7 @@ struct Hashing {
   }
   void upd(int i, char c) {
     upd(1, 1, n, i, c);
+    s[i] = c;
   }
   T get_hash(int l, int r) { // 1 - indexed
     return query(1, 1, n, l, r)[0] * ipw[l - 1];

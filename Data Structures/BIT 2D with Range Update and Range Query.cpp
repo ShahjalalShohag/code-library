@@ -33,7 +33,7 @@ struct BIT2D {
       mul += t[x][i][0];
       add += t[x][i][1];
     }
-    return mul * x + add;
+    return mul * y + add;
   }
   long long query1(int x, int y) {
     long long mul = 0, add = 0;

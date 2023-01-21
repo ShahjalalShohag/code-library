@@ -116,7 +116,7 @@ struct line {
 };
 // find a point from a through b with distance d
 PT point_along_line(PT a, PT b, double d) {
-    return a + (((b - a) / (b - a).norm()) * d);
+    return a == b ? a : a + (((b - a) / (b - a).norm()) * d);
 }
 // projection point c onto line through a and b  assuming a != b
 PT project_from_point_to_line(PT a, PT b, PT c) {

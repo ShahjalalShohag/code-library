@@ -45,7 +45,7 @@ vector<long long> multiply(vector<int> &a, vector<int> &b) {
   for(int i = 0; i < sz; ++i) z[i] = x[i] * y[i];
   fft(z, 1);
   vector<long long> ret(sz);
-  for(int i = 0; i < sz; ++i) ret[i] = (long long) (z[i].a + 0.5);
+  for(int i = 0; i < sz; ++i) ret[i] = (long long) round(z[i].a);
   while((int)ret.size() > 1 && ret.back() == 0) ret.pop_back();
   return ret;
 }

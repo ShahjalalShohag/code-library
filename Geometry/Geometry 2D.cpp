@@ -63,6 +63,11 @@ void polar_sort(vector<PT> &v) { // sort points in counterclockwise
         return make_tuple(half(a), 0.0, a.norm2()) < make_tuple(half(b), cross(a, b), b.norm2());
     });
 }
+void polar_sort(vector<PT> &v, PT o) { // sort points in counterclockwise with respect to point o
+    sort(v.begin(), v.end(), [&](PT a,PT b) {
+        return make_tuple(half(a - o), 0.0, (a - o).norm2()) < make_tuple(half(b - o), cross(a - o, b - o), (b - o).norm2());
+    });
+}
 struct line {
     PT a, b; // goes through points a and b
     PT v; double c;  //line form: direction vec [cross] (x, y) = c 
@@ -116,7 +121,8 @@ struct line {
 };
 // find a point from a through b with distance d
 PT point_along_line(PT a, PT b, double d) {
-    return a == b ? a : a + (((b - a) / (b - a).norm()) * d);
+    assert(a != b);
+    return a + (((b - a) / (b - a).norm()) * d);
 }
 // projection point c onto line through a and b  assuming a != b
 PT project_from_point_to_line(PT a, PT b, PT c) {
@@ -125,7 +131,7 @@ PT project_from_point_to_line(PT a, PT b, PT c) {
 // reflection point c onto line through a and b  assuming a != b
 PT reflection_from_point_to_line(PT a, PT b, PT c) {
     PT p = project_from_point_to_line(a,b,c);
-    return point_along_line(c, p, 2.0 * dist(c, p));
+    return p + p - c;
 }
 // minimum distance from point c to line through a and b
 double dist_from_point_to_line(PT a, PT b, PT c) {
@@ -143,7 +149,7 @@ bool is_point_on_seg(PT a, PT b, PT p) {
 // minimum distance point from point c to segment ab that lies on segment ab
 PT project_from_point_to_seg(PT a, PT b, PT c) {
     double r = dist2(a, b);
-    if (fabs(r) < eps) return a;
+    if (sign(r) == 0) return a;
     r = dot(c - a, b - a) / r;
     if (r < 0) return a;
     if (r > 1) return b;

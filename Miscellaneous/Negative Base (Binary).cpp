@@ -2,6 +2,7 @@
 using namespace std;
 
 const int N = 105;
+// https://en.wikipedia.org/wiki/Negative_base
 int decimal(string s) {
   int ans = 0, cur = 1, n = s.size();
   for (int i = n - 1; i >= 0; i--) {

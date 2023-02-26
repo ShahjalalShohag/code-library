@@ -54,7 +54,7 @@ vector<int> multiply(vector<int> &a, vector<int> &b) {
   return ret;
 }
 //find occurrences of t in s where '?'s are automatically matched with any character
-//res[i + m - 1] = sum_j=0 to m - 1_{s[i + j] * t[j] * (s[i + j] - t[j])
+//res[i + m - 1] = sum_j=0 to m - 1_{s[i + j] * t[j] * (s[i + j] - t[j])^2
 vector<int> string_matching(string &s, string &t) {
   int n = s.size(), m = t.size();
   vector<int> s1(n), s2(n), s3(n);

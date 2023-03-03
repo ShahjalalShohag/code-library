@@ -1,6 +1,7 @@
 // n = total person
 // will kill every kth person, if k = 2, 2,4,6,...
 // returns the mth killed person
+// O(k log n)
 ll josephus(ll n, ll k, ll m) {
   m = n - m;
   if (k <= 1)return n - m;

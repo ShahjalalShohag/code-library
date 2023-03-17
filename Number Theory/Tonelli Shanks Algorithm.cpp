@@ -3,6 +3,19 @@ using namespace std;
 
 const int N = 3e5 + 9;
 
+bool is_prime(int p) {
+  if (p < 2) {
+    return false;
+  }
+  for (int i = 2; i * i <= p; i++) {
+    if (p % i == 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
 int power(long long n, long long k, const int mod) {
   int ans = 1 % mod; n %= mod; if (n < 0) n += mod;
   while (k) {
@@ -12,11 +25,16 @@ int power(long long n, long long k, const int mod) {
   }
   return ans;
 }
+
+
 // find sqrt(a) % p, i.e. find any x such that x^2 = a (mod p)
 // if a solution exist, then if a == 0 or p == 2, there are 1 solution, otherwise, there are exactly 2 solutions (x and p - x)
 // p is prime
 // complexity: O(log^2 p) worst case, O(log p) on average
 int SQRT(int a, int p) {
+
+  if(!is_prime(p))return -1 ;//Checks whether p is prime 
+
   a %= p; if (a < 0) a += p;
   if (a == 0) return 0;
   if (power(a, (p - 1) / 2, p) != 1) return -1; // solution does not exist

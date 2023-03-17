@@ -29,7 +29,7 @@ int power(long long n, long long k, const int mod) {
 
 // find sqrt(a) % p, i.e. find any x such that x^2 = a (mod p)
 // if a solution exist, then if a == 0 or p == 2, there are 1 solution, otherwise, there are exactly 2 solutions (x and p - x)
-// p is prime
+
 // complexity: O(log^2 p) worst case, O(log p) on average
 int SQRT(int a, int p) {
 

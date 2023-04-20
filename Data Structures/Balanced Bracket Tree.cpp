@@ -2,7 +2,8 @@
 using namespace std;
 
 const int N = 2e5 + 9;
-vector<int> g[N];
+// there is a directed edge from bracket i to bracket j if j is directly inside i
+vector<int> g[N]; 
 int sz[N];
 void dfs(int u) {
   sz[u] = 1;
@@ -53,3 +54,4 @@ int32_t main() {
   }
   return 0;
 }
+// https://codeforces.com/contest/1821/problem/E

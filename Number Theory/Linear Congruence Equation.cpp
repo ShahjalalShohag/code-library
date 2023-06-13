@@ -26,10 +26,11 @@ vector<ll> congruence_equation(ll a, ll b, ll m) {
   ll g = gcd(a, m), x;
   if (b % g != 0) return ret;
   a /= g, b /= g;
-  x = inverse(a, m / g);
+  x = inverse(a, m / g) * b;
   for (int k = 0; k < g; ++k) { // exactly g solutions
-    ret.push_back((x * b + m / g * k) % m);
+    ret.push_back((x + m / g * k) % m);
   }
+  // minimum solution = (m / g - (m - x) % (m / g)) % (m / g)
   return ret;
 }
 int32_t main() {

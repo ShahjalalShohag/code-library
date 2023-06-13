@@ -416,7 +416,7 @@ int tangent_lines_from_point(PT p, double r, PT q, line &u, line &v) {
 int tangents_lines_from_circle(PT c1, double r1, PT c2, double r2, bool inner, line &u, line &v) {
     if (inner) r2 = -r2;
     PT d = c2 - c1;
-    double dr = r1 - r2, d2 = d.norm(), h2 = d2 - dr * dr;
+    double dr = r1 - r2, d2 = d.norm2(), h2 = d2 - dr * dr;
     if (d2 == 0 || h2 < 0) {
         assert(h2 != 0);
         return 0;

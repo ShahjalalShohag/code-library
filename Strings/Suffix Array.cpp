@@ -2,6 +2,7 @@
 using namespace std;
 
 const int N = 3e5 + 9;
+const int LG = 18;
 
 void induced_sort(const vector<int> &vec, int val_range, vector<int> &SA, const vector<bool> &sl, const vector<int> &lms_idx) {
   vector<int> l(val_range, 0), r(val_range, 0);
@@ -88,7 +89,6 @@ struct SuffixArray {
   int n;
   string s;
   vector<int> sa, rank, lcp;
-  static const int LG = 18;
   vector<vector<int>> t;
   vector<int> lg;
   SuffixArray() {}

@@ -1047,7 +1047,7 @@ vector<PT> minkowski_sum(vector<PT> &a, vector<PT> &b) {
     int i = 0, j = 0; //assuming a[i] and b[j] both are (left, bottom)-most points
     vector<PT> c;
     c.push_back(a[i] + b[j]);
-    while (i + 1 < n || j + 1 < m){
+    while (1) {
         PT p1 = a[i] + b[(j + 1) % m];
         PT p2 = a[(i + 1) % n] + b[j];
         int t = orientation(c.back(), p1, p2);

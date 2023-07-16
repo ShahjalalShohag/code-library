@@ -840,27 +840,66 @@ double polygon_line_intersection(vector<PT> p, PT a, PT b) {
 pair<PT, PT> convex_line_intersection(vector<PT> &p, PT a, PT b) {
 	return {{0, 0}, {0, 0}};
 }
-// minimum distance from a point to a convex polygon
-// it assumes point does not lie strictly inside the polygon
-double dist_from_point_to_polygon(vector<PT> &v, PT p) { // O(log n)
-    int n = (int)v.size();
-    if (n <= 3) {
-    	double ans = inf;
-	    for(int i = 0; i < n; i++) ans = min(ans, dist_from_point_to_seg(v[i], v[(i + 1) % n], p));
-	    return ans;
-	}
-    PT bscur, bs = angle_bisector(v[n - 1], v[0], v[1]);
-    int ok,  i,  pw = 1,  ans = 0,  sgncur,  sgn = sign(cross(bs, p - v[0]));
-    while (pw <= n) pw <<= 1;
-    while ((pw >>= 1)) {
-        if ((i = ans + pw) < n) {
-            bscur = angle_bisector(v[i - 1], v[i], v[(i + 1) % n]);
-            sgncur = sign(cross(bscur, p - v[i]));
-            ok = sign(cross(bs, bscur)) >= 0 ? (sgn >= 0 || sgncur <= 0) : (sgn >= 0 && sgncur <= 0);
-            if (ok) ans = i, bs = bscur, sgn = sgncur;
+
+pair<PT, int> point_poly_tangent(vector<PT> &p, PT Q, int dir, int l, int r) {
+    while (r - l > 1) {
+        int mid = (l + r) >> 1;
+        bool pvs = orientation(Q, p[mid], p[mid - 1]) != -dir;
+        bool nxt = orientation(Q, p[mid], p[mid + 1]) != -dir;
+        if (pvs && nxt) return {p[mid], mid};
+        if (!(pvs || nxt)) {
+            auto p1 = point_poly_tangent(p, Q, dir, mid + 1, r);
+            auto p2 = point_poly_tangent(p, Q, dir, l, mid - 1);
+            return orientation(Q, p1.first, p2.first) == dir ? p1 : p2;
+        }
+        if (!pvs) {
+            if (orientation(Q, p[mid], p[l]) == dir)  r = mid - 1;
+            else if (orientation(Q, p[l], p[r]) == dir) r = mid - 1;
+            else l = mid + 1;
+        }
+        if (!nxt) {
+            if (orientation(Q, p[mid], p[l]) == dir)  l = mid + 1;
+            else if (orientation(Q, p[l], p[r]) == dir) r = mid - 1;
+            else l = mid + 1;
         }
     }
-    return dist_from_point_to_seg(v[ans], v[(ans + 1) % n], p);
+    pair<PT, int> ret = {p[l], l};
+    for (int i = l + 1; i <= r; i++) ret = orientation(Q, ret.first, p[i]) != dir ? make_pair(p[i], i) : ret;
+    return ret;
+}
+// (cw, ccw) tangents from a point that is outside this convex polygon
+// returns indexes of the points
+pair<int, int> tangents_from_point_to_polygon(vector<PT> &p, PT Q){
+    int cw = point_poly_tangent(p, Q, 1, 0, (int)p.size() - 1).second;
+    int ccw = point_poly_tangent(p, Q, -1, 0, (int)p.size() - 1).second;
+    return make_pair(cw, ccw);
+}
+
+// minimum distance from a point to a convex polygon
+// it assumes point does not lie strictly inside the polygon
+double dist_from_point_to_polygon(vector<PT> &p, PT z) {
+    double ans = inf;
+    int n = p.size();
+    if (n <= 3) {
+        for(int i = 0; i < n; i++) ans = min(ans, dist_from_point_to_seg(p[i], p[(i + 1) % n], z));
+        return ans;
+    }
+    int inside = is_point_in_convex(p, z);
+    if(inside == 0) return 0;
+    assert(inside != -1);
+    auto [r, l] = tangents_from_point_to_polygon(p, z);
+    if(l > r) r += n;
+    while (l < r) {
+        int mid = (l + r) >> 1;
+        double left = dist2(p[mid % n], z), right= dist2(p[(mid + 1) % n], z);
+        ans = min({ans, left, right});
+        if(left < right) r = mid;
+        else l = mid + 1;
+    }
+    ans = sqrt(ans);
+    ans = min(ans, dist_from_point_to_seg(p[l % n], p[(l + 1) % n], z));
+    ans = min(ans, dist_from_point_to_seg(p[l % n], p[(l - 1 + n) % n], z));
+    return ans;
 }
 // minimum distance from convex polygon p to line ab
 // returns 0 is it intersects with the polygon
@@ -903,39 +942,7 @@ double maximum_dist_from_polygon_to_polygon(vector<PT> &u, vector<PT> &v){ //O(n
     }
     return sqrt(ans);
 }
-pair<PT, int> point_poly_tangent(vector<PT> &p, PT Q, int dir, int l, int r) {
-    while (r - l > 1) {
-        int mid = (l + r) >> 1;
-        bool pvs = orientation(Q, p[mid], p[mid - 1]) != -dir;
-        bool nxt = orientation(Q, p[mid], p[mid + 1]) != -dir;
-        if (pvs && nxt) return {p[mid], mid};
-        if (!(pvs || nxt)) {
-            auto p1 = point_poly_tangent(p, Q, dir, mid + 1, r);
-            auto p2 = point_poly_tangent(p, Q, dir, l, mid - 1);
-            return orientation(Q, p1.first, p2.first) == dir ? p1 : p2;
-        }
-        if (!pvs) {
-            if (orientation(Q, p[mid], p[l]) == dir)  r = mid - 1;
-            else if (orientation(Q, p[l], p[r]) == dir) r = mid - 1;
-            else l = mid + 1;
-        }
-        if (!nxt) {
-            if (orientation(Q, p[mid], p[l]) == dir)  l = mid + 1;
-            else if (orientation(Q, p[l], p[r]) == dir) r = mid - 1;
-            else l = mid + 1;
-        }
-    }
-    pair<PT, int> ret = {p[l], l};
-    for (int i = l + 1; i <= r; i++) ret = orientation(Q, ret.first, p[i]) != dir ? make_pair(p[i], i) : ret;
-    return ret;
-}
-// (cw, ccw) tangents from a point that is outside this convex polygon
-// returns indexes of the points
-pair<int, int> tangents_from_point_to_polygon(vector<PT> &p, PT Q){
-    int cw = point_poly_tangent(p, Q, 1, 0, (int)p.size() - 1).second;
-    int ccw = point_poly_tangent(p, Q, -1, 0, (int)p.size() - 1).second;
-    return make_pair(cw, ccw);
-}
+
 // calculates the area of the union of n polygons (not necessarily convex). 
 // the points within each polygon must be given in CCW order.
 // complexity: O(N^2), where N is the total number of points

@@ -876,7 +876,7 @@ pair<int, int> tangents_from_point_to_polygon(vector<PT> &p, PT Q){
 }
 
 // minimum distance from a point to a convex polygon
-// it assumes point does not lie strictly outside the polygon
+// it assumes point lie strictly outside the polygon
 double dist_from_point_to_polygon(vector<PT> &p, PT z) {
     double ans = inf;
     int n = p.size();

@@ -876,7 +876,7 @@ pair<int, int> tangents_from_point_to_polygon(vector<PT> &p, PT Q){
 }
 
 // minimum distance from a point to a convex polygon
-// it assumes point does not lie strictly inside the polygon
+// it assumes point does not lie strictly outside the polygon
 double dist_from_point_to_polygon(vector<PT> &p, PT z) {
     double ans = inf;
     int n = p.size();
@@ -884,9 +884,6 @@ double dist_from_point_to_polygon(vector<PT> &p, PT z) {
         for(int i = 0; i < n; i++) ans = min(ans, dist_from_point_to_seg(p[i], p[(i + 1) % n], z));
         return ans;
     }
-    int inside = is_point_in_convex(p, z);
-    if(inside == 0) return 0;
-    assert(inside != -1);
     auto [r, l] = tangents_from_point_to_polygon(p, z);
     if(l > r) r += n;
     while (l < r) {
@@ -912,6 +909,8 @@ double dist_from_polygon_to_line(vector<PT> &p, PT a, PT b, int top) { //O(log n
 	return dist_from_point_to_line(a, b, p[id]); //does not intersect
 }
 // minimum distance from a convex polygon to another convex polygon
+// the polygon doesnot overlap or touch
+// tested in https://toph.co/p/the-wall
 double dist_from_polygon_to_polygon(vector<PT> &p1, vector<PT> &p2) { // O(n log n)
     double ans = inf;
     for (int i = 0; i < p1.size(); i++) {

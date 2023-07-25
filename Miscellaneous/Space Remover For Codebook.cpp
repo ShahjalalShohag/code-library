@@ -13,7 +13,8 @@ bool op(string s) {
   return 0;
 }
 
-
+// Given a code it will congest the code but the code will remain compilable. 
+// You can use it when you want to save some space in your 25 pages codebook.
 int32_t main() {
   ios_base::sync_with_stdio(0);
   cin.tie(0);

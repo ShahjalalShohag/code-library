@@ -7,7 +7,7 @@ using namespace std;
 
 const int N = 2e5 + 9;
 
-const unsigned long long all = (1ull << 64) - 1;
+const unsigned long long all = ULLONG_MAX;
 const int sz = N / 64 + 2;
 unsigned long long o[64][64], z[64][64];
 void init()
@@ -85,6 +85,8 @@ struct Bitset
         return ans;
     }
     inline Bitset operator << (const int k) const {
+        if(k == 0) return *this;
+        assert(k >= 0);
         Bitset b;
         int s1 = k & 63, s2 = 64 - s1;
         for (int i = sz - 1, j = i - (k + 63) / 64; j > -2; i--, j--){
@@ -95,6 +97,8 @@ struct Bitset
         return b;
     }
     inline Bitset operator >> (const int k) const {
+        if(k == 0) return *this;
+        assert(k >= 0);
         Bitset b;
         int s1 = k & 63, s2 = 64 - s1;
         for (int i = 0, j = (k + 63) / 64; j <= sz; i++, j++){

@@ -214,10 +214,6 @@ struct SGTBeats {
     return lv + rv;
   }
 
-  SGTBeats(int n) {
-    SGTBeats(n, nullptr);
-  }
-
   SGTBeats(int n, ll *a) : n(n) {
     n0 = 1;
     while (n0 < n) n0 <<= 1;
@@ -241,7 +237,8 @@ struct SGTBeats {
     }
   }
 
-  // all queries are performed on [l, r) segment
+  // all queries are performed on [l, r) segment (right exclusive)
+  // 0 indexed
 
   // range minimize query
   void update_min(int a, int b, ll x) {

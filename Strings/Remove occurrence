@@ -1,0 +1,62 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+bool checkCount(int count1[], int count2[])
+{
+    for (int i = 0; i < 26; i++)
+    {
+        if (count1[i] != count2[2])
+            return false;
+    }
+    return true;
+}
+
+bool checkInclusion(string s1, string s2)
+{
+
+    int count1[26] = {0};
+    int count2[26] = {0};
+
+    for (auto a : s1)
+    {
+        count1[a - 'a']++;
+    }
+
+    int i = 0;
+    int windowSize = s1.length();
+
+    while (i < windowSize)
+    {
+        int index = s2[i] - 'a';
+        count2[index]++;
+        i++;
+    }
+
+    if (checkCount(count1, count2))
+    {
+        return true;
+    }
+
+    while (i < s2.length())
+    {
+        char newChar = s2[i];
+        count2[newChar - 'a']++;
+
+        char oldChar = s2[i - windowSize];
+        count2[oldChar - 'a']--;
+        i++;
+        if (checkCount(count1, count2))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+int main()
+{
+    string s1 = "ab";
+    string s2 = "eidbaooo";
+
+    cout << checkInclusion(s1, s2) << endl;
+}

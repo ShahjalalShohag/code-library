@@ -4,9 +4,12 @@ using namespace std;
 const int N = 3e5 + 9;
 int a[N];
 
-// Segment Tree with point update and range query
-// Replace 'T' with appropriate type (int, long long, etc.)
-// 1 based indexing
+/**
+ * Segment Tree with point update and range query
+ * Replace 'T' with appropriate type (int, long long, etc.)
+ * 1 based indexing
+ * Tested on: https://lightoj.com/problem/curious-robin-hood
+ */
 template <typename T>
 struct ST {
   T t[4 * N];
@@ -55,7 +58,7 @@ struct ST {
   }
 };
 
-int main() {
+int32_t main() {
   ios_base::sync_with_stdio(0);
   cin.tie(0);
 

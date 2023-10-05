@@ -1,6 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
+// https://victorlecomte.com/cp-geo.pdf
 const double inf = 1e100;
 const double eps = 1e-9;
 const double PI = acos((double)-1.0);
@@ -79,7 +80,11 @@ inline double dot(p3 a, p3 b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
 inline double dist2(p3 a, p3 b) { return dot(a - b, a - b); }
 inline double dist(p3 a, p3 b) { return sqrt(dot(a - b, a - b)); }
 inline p3 cross(p3 a, p3 b) { return p3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x); }
+// if s is on the same side of the plane pqr as the vector pq * pr then it will be positive
+// otherwise negative or 0 if on the plane
 double orient(p3 p, p3 q, p3 r, p3 s) { return (q - p) * (r - p) | (s - p); }
+// returns orientation of p to q to r on the plane perpendicular to n
+// assuming p, q, r are on the plane
 double orient_by_normal(p3 p, p3 q, p3 r, p3 n) { return (q - p) * (r - p) | n; }
 double get_angle(p3 a, p3 b) {
     double costheta = dot(a, b) / a.abs() / b.abs();
@@ -90,6 +95,7 @@ double small_angle(p3 v, p3 w) {
 }
 
 struct plane {
+    // n is the perpendicular normal vector to the plane
     p3 n; double d; // (n | p) = d
     // From normal n and offset d
     plane(p3 n, double d) : n(n), d(d) {}
@@ -97,64 +103,93 @@ struct plane {
     plane(p3 n, p3 p) : n(n), d(n | p) {}
     // From three non-collinear points P,Q,R
     plane(p3 p, p3 q, p3 r) : plane((q - p) * (r - p), p) {}
+    // positive if on the same side as the normal, negative if on the opposite side, 0 if on the plane
     double side(p3 p) { return (n | p) - d; }
+    // distance from point p to plane
     double dist(p3 p) { return fabs(side(p)) / abs(n); }
+    // translate the plane by vector t
     plane translate(p3 t) { return {n, d + (n | t)}; }
+    // shift the plane perpendicular to n by distance dist
     plane shiftUp(double dist) { return {n, d + dist * abs(n)}; }
+    // orthogonal projection of point p onto plane
     p3 proj(p3 p) { return p - n * side(p) / sq(n); }
+    // orthogonal reflection of point p onto plane
     p3 refl(p3 p) { return p - n * 2 * side(p) / sq(n); }
 };
 
 struct coords {
+    // coordinate system for coplanar points
+    // o is the origin, dx, dy, dz are unit vectors similar to normal 3D system
+    // but dx and dy are on the plane
     p3 o, dx, dy, dz;
-    // From three points P, Q, R on the plane:
-    // build an orthonormal 3D basis
+    // From three points P, Q, R on the plane
     coords(p3 p, p3 q, p3 r) : o(p) {
         dx = unit(q - p);
         dz = unit(dx * (r - p));
         dy = dz * dx;
     }
     // From four points P,Q,R,S: take directions PQ, PR, PS as is
-    // it allows us to keep using integer coordinates but has some pitfalls.
+    // it allows us to keep using integer coordinates but has some pitfalls
+    // e.g. distances and angles are not preserved but relative positions are (convex hull works)
     coords(p3 p, p3 q, p3 r, p3 s) :
 		o(p), dx(q - p), dy(r - p), dz(s - p) {}
+    // 2D position vector of point p in this coordinate system centered at o
+    // p must be on the plane
     PT pos2d(p3 p) {
         return {(p - o) | dx, (p - o) | dy};
     }
+    // returns the 3D position vector of point p in this new coordinate system
+    // p can be outside the plane
     p3 pos3d(p3 p) {
         return {(p - o) | dx, (p - o) | dy, (p - o) | dz};
     }
-    p3 pos3d(PT p){ //original position vector
+    // given 2D position vector p centered at o, return the original 3D position vector
+    p3 pos3d(PT p){
         return o + dx * p.x + dy * p.y;
     }
 };
 
 struct line3d {
-    p3 d, o; // p = o + k * d
+    // d is the direction vector of the line
+    p3 d, o; // p = o + k * d (k is a real parameter)
     // From two points P, Q
     line3d(p3 p, p3 q) : d(q - p), o(p) {}
-    // From two planes p1, p2 (requires T = double, planes are not parallel)
+    // From two planes p1, p2
+    // assuming they are not parallel
     line3d(plane p1, plane p2) {
         d = p1.n * p2.n;
         o = (p2.n * p1.d - p1.n * p2.d) * d / sq(d);
+        // o is actually the closest point on the line to the origin
     }
     double dist2(p3 p) { return sq(d * (p - o)) / sq(d); }
     double dist(p3 p) { return sqrt(dist2(p)); }
+    // compare points by their projection on the line
+    // so you can sort points on the line using this
     bool cmp_proj(p3 p, p3 q) { return (d | p) < (d | q); }   
+    // orthogonal projection of point p onto line
     p3 proj(p3 p) { return o + d * (d|(p - o)) / sq(d); }
+    // orthogonal reflection of point p onto line
     p3 refl(p3 p) { return proj(p) * 2 - p; }
-    p3 inter(plane p) { return o - d * p.side(o) / (d | p.n); } // assuming plane and line are not parallel
+    // returns the intersection point of the line with plane p
+    // assuming plane and line are not parallel
+    p3 inter(plane p) { 
+        // assert((d | p.n) != 0); // no intersection if parallel
+        return o - d * p.side(o) / (d | p.n); 
+    }
 };
 
+// smallest distance between two lines
 double dist(line3d l1, line3d l2) {
     p3 n = l1.d * l2.d;
-    if (n == zero) return l1.dist(l2.o);// parallel
+    if (n == zero) return l1.dist(l2.o); // parallel
     return fabs((l2.o - l1.o) | n) / abs(n);
 }
+// closest point from line l2 to line l1
 p3 closest_on_l1(line3d l1, line3d l2) {
     p3 n2 = l2.d * (l1.d * l2.d);
     return l1.o + l1.d * ((l2.o - l1.o) | n2) / (l1.d | n2);
 }
+// small angle between direction vectors of two lines
 double get_angle(line3d l1, line3d l2) {
     return small_angle(l1.d, l2.d);
 }
@@ -164,6 +199,7 @@ bool is_parallel(line3d l1, line3d l2) {
 bool is_perpendicular(line3d l1, line3d l2) {
     return sign((l1.d | l2.d)) == 0;
 }
+// small angle between normal vectors of two planes
 double get_angle(plane p1, plane p2) {
     return small_angle(p1.n, p2.n);
 }
@@ -182,6 +218,10 @@ bool is_parallel(plane p, line3d l) {
 bool is_perpendicular(plane p, line3d l) {
     return p.n * l.d == zero;
 }
+// returns the line perpendicular to plane p and passing through point o
+line3d perp_through(plane p, p3 o) {return line(o, o + p.n);}
+// returns the plane perpendicular to line l and passing through point o
+plane perp_through(line3d l, p3 o) {return plane(l.d, o);}
 
 // returns two points on intesection line of two planes formed by points
 // a1, b1, c1 and a2, b2, c2 respectively
@@ -223,7 +263,7 @@ double distance_from_triangle_to_point(p3 a, p3 b, p3 c, p3 d) {
 double distance_from_triangle_to_segment(p3 a, p3 b, p3 c, p3 d, p3 e) {
     double l = 0.0, r = 1.0;
     int cnt = 100;
-    double ret = 1e12; //beware!
+    double ret = inf;
     while (cnt--) {
         double mid1 = l + (r - l) / 3.0, mid2 = r - (r - l) / 3.0;
         double x = distance_from_triangle_to_point(a, b, c, d + (e - d) * mid1);
@@ -239,8 +279,9 @@ double distance_from_triangle_to_segment(p3 a, p3 b, p3 c, p3 d, p3 e) {
     }
     return ret;
 }
+// triangles are solid
 double distance_from_triangle_to_triangle(p3 a, p3 b, p3 c, p3 d, p3 e, p3 f) {
-    double ret = 1e12; // beware!
+    double ret = inf;
     ret = min(ret, distance_from_triangle_to_segment(a, b, c, d, e));
     ret = min(ret, distance_from_triangle_to_segment(a, b, c, e, f));
     ret = min(ret, distance_from_triangle_to_segment(a, b, c, f, d));
@@ -256,10 +297,11 @@ bool operator < (p3 p, p3 q) {
 }
 struct edge {
     int v;
-    bool same; // is the common edge in the same order?
+    bool same; // is the common edge between two faces in the same order?
 };
-// Given a series of faces (lists of points), reverse some of them
-// so that their orientations are consistent
+// Given a series of faces (lists of points) of a polyhedron, reverse some of them
+// so that their orientations are consistent (all area vectors of the faces either pointing outwards or inwards)
+// just compute the area vector of one face to see if it’s pointing outwards or inwards
 vector<vector<p3>> reorient(vector<vector<p3>> fs) {
     int n = fs.size();
 	// Find the common edges and create the resulting graph
@@ -268,7 +310,7 @@ vector<vector<p3>> reorient(vector<vector<p3>> fs) {
     for (int u = 0; u < n; u++) {
         for (int i = 0, m = fs[u].size(); i < m; i++) {
             p3 a = fs[u][i], b = fs[u][(i + 1) % m];
-			// Let’s look at edge [AB]
+			// Let’s look at edge a-b
             if (es.count({a, b})) { // seen in same order
                 int v = es[{a, b}];
                 g[u].push_back({v, true});
@@ -310,6 +352,7 @@ vector<vector<p3>> reorient(vector<vector<p3>> fs) {
     return fs;
 }
 
+// O(n^2), O(n) faces in the hull
 struct CH3D {
     struct face {
         int a, b, c; // the number of three points on one face of the convex hull
@@ -490,6 +533,9 @@ struct CH3D {
     }
 };
 
+// https://desktop.arcgis.com/en/arcmap/10.7/map/projections/geographic-coordinate-system.htm
+// given the radius of the sphere, latitude and longitude of a point in degrees
+// return the 3D coordinates of the point on the sphere assuming the sphere is centered at the origin
 p3 get_sphere(double r, double lat, double lon) {
     lat *= PI / 180, lon *= PI / 180;
     return {r * cos(lat) * cos(lon), r * cos(lat) * sin(lon), r * sin(lat)};
@@ -502,9 +548,11 @@ int sphere_line_intersection(p3 o, double r, line3d l, pair<p3,p3> &out) {
     out = {p - h, p + h};
     return 1 + (h2 > 0);
 }
-//The shortest distance between two points A and B on a sphere (O, r) is
-//given by travelling along plane OAB. It is called the great-circle distance
-double greatCircleDist(p3 o, double r, p3 a, p3 b) {
+// The shortest distance between two points A and B on a sphere (O, r) is
+// given by travelling along plane OAB and on the surface of the sphere. It is called the great-circle distance
+// if a and b are outside the sphere, then it will give the distance between their projections on the sphere
+double great_circle_dist(p3 o, double r, p3 a, p3 b) {
+    // s = r * theta
     return r * get_angle(a - o, b - o);
 }
 
@@ -533,7 +581,7 @@ bool point_on_sphere_segment(p3 a, p3 b, p3 p) {
     return (n | p) == 0 && (n | a * p) >= 0 && (n | b * p) <= 0;
 }
 
-struct Set : vector<p3> {
+struct DirectionSet : vector<p3> {
     using vector::vector; // import constructors
     void insert(p3 p) {
         for (p3 q : *this) if (p*q == zero) return;
@@ -541,11 +589,13 @@ struct Set : vector<p3> {
     }
 };
 // Assume that the sphere is centered at the origin
-Set segment_segment_intersection_on_sphere(p3 a, p3 b, p3 c, p3 d) {
+// it returns the direction vectors of the intersection points
+// to get the actual points, scale the direction vectors to the radius of the sphere
+DirectionSet segment_segment_intersection_on_sphere(p3 a, p3 b, p3 c, p3 d) {
     assert(validSegment(a, b) && validSegment(c, d));
     p3 out;
-    if (proper_intersection(a, b, c, d, out)) return {out};
-    Set s;
+    if (proper_intersection(a, b, c, d, out)) return {out}; 
+    DirectionSet s;
     if (point_on_sphere_segment(c, d, a)) s.insert(a);
     if (point_on_sphere_segment(c, d, b)) s.insert(b);
     if (point_on_sphere_segment(a, b, c)) s.insert(c);
@@ -553,17 +603,27 @@ Set segment_segment_intersection_on_sphere(p3 a, p3 b, p3 c, p3 d) {
     return s;
 }
 
+// small angle between spherical segments ab and ac
+// assume that the sphere is centered at the origin
+// all points a, b, c are on the sphere
 double angle_on_sphere(p3 a, p3 b, p3 c) {
     return get_angle(a * b, a * c);
 }
 
-// Assume that the sphere is centered at the origin
+// oriented angle between spherical segments ab and ac
+// that is how much we rotate counterclockwise to get from ab to ac
+// assume that the sphere is centered at the origin
+// all points a, b, c are on the sphere
 double oriented_angle_on_sphere(p3 a, p3 b, p3 c) {
     if ((a * b | c) >= 0) return angle_on_sphere(a, b, c);
     else return 2 * PI - angle_on_sphere(a, b, c);
 }
 
 // Assume that the sphere is centered at the origin
+// the polygon is simple and given in counterclockwise order
+// for each consecutive pair of points, the counterclockwise left 
+// part of the segment is considered to be inside the surface area that the polygon encloses
+// if the polygon is outside the sphere, the projection of the polygon on the sphere will be considered
 double area_on_the_surface_of_the_sphere(double r, vector<p3> p) {
     int n = p.size();
     double sum = -(n - 2) * PI;
@@ -573,10 +633,10 @@ double area_on_the_surface_of_the_sphere(double r, vector<p3> p) {
     return r * r * sum;
 }
 
-// 0 if O is outside the polyhedron
+// Assume that O is the origin
+// it returns 0 if O is outside the polyhedron
 // 1 if O is inside the polyhedron, and the vector areas of the faces are oriented towards the outside;
 // −1 if O is inside the polyhedron, and the vector areas of the faces are oriented towards the inside.
-// Assume that O is the origin
 int winding_number_3D(vector<vector<p3>> fs) {
     double sum = 0;
     for (vector<p3> f : fs) {

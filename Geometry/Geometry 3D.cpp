@@ -152,6 +152,7 @@ struct coords {
 struct line3d {
     // d is the direction vector of the line
     p3 d, o; // p = o + k * d (k is a real parameter)
+    line3d() {}
     // From two points P, Q
     line3d(p3 p, p3 q) : d(q - p), o(p) {}
     // From two planes p1, p2
@@ -219,7 +220,7 @@ bool is_perpendicular(plane p, line3d l) {
     return p.n * l.d == zero;
 }
 // returns the line perpendicular to plane p and passing through point o
-line3d perp_through(plane p, p3 o) {return line(o, o + p.n);}
+line3d perp_through(plane p, p3 o) {return line3d(o, o + p.n);}
 // returns the plane perpendicular to line l and passing through point o
 plane perp_through(line3d l, p3 o) {return plane(l.d, o);}
 
@@ -644,6 +645,135 @@ int winding_number_3D(vector<vector<p3>> fs) {
     }
    	return round(sum / (4 * PI));
 }
+
+struct sphere {
+	p3 c;
+	double r;
+	sphere() {}
+	sphere(p3 c, double r) : c(c), r(r) {}
+};
+
+// spherical cap is a portion of a sphere cut off by a plane
+// https://en.wikipedia.org/wiki/Spherical_cap
+struct spherical_cap {
+	p3 c;
+	double r;
+	spherical_cap() {}
+	spherical_cap(p3 c, double r) : c(c), r(r) {}
+
+	// angle th is the polar angle between the rays from the center of the sphere to one edge of the cap
+	// and orthogonal line from the center of the sphere to the plane of the cap
+
+	// height of the cap (just like real world cap)
+	double height(double th)      {
+		return r * (1 - cos(th));
+	}
+	// radius of the base of the cap
+	double base_radius(double th)  {
+		return r * sin(th);
+	}
+	// volume of the cap
+	double volume(double th)      {
+		double h = height(th);
+		return PI * h * h * (3 * r - h) / 3.0;
+	}
+	// surface area of the cap
+	double surface_area(double th) {
+		double h = height(th);
+		return 2 * PI * r * h;
+	}
+};
+
+// returns the sphere passing through four points
+sphere circumscribed_sphere(p3 a, p3 b, p3 c, p3 d) {
+	assert( sign(plane(a, b, c).side(d)) != 0);
+
+	plane u = plane(a - b, (a + b) / 2);
+	plane v = plane(b - c, (b + c) / 2);
+	plane w = plane(c - d, (c + d) / 2);
+
+	assert(!is_parallel(u, v));
+	assert(!is_parallel(v, w));
+	line3d l1(u, v), l2(v, w);
+	assert( sign(dist(l1, l2)) == 0);
+
+	p3 C = closest_on_l1(l1, l2);
+	return sphere(C, abs(C - a));
+}
+
+// https://mathworld.wolfram.com/Sphere-SphereIntersection.html
+// it won't work if one sphere is totally inside the other sphere
+// handle that case separately
+// returns the surface area and volume of the intersection
+pair<double, double> sphere_sphere_intersection(sphere s1, sphere s2) {
+	double d = abs(s1.c - s2.c);
+	if(sign(d - s1.r - s2.r) >= 0) return {0, 0}; // not intersecting
+	// only the distance matters, so we will now consider the centers
+	// of the big sphere to be (0, 0, 0) and (d, 0, 0) for the small sphere
+	// we can transform the results back to w.r.t the real centers if we want
+
+	double R = max(s1.r, s2.r);
+	double r = min(s1.r, s2.r);
+	double y = R + r - d;
+	double x = (R * R - r * r + d * d) / (2 * d);
+	// the intersecting plane is parallel to the yz plane
+	// with the above x value as its x coordinate
+	double w = d * d - r * r  + R * R;
+	double a = sqrt(4 * d * d * R * R - w * w) / (2.0 * d);
+	// a is the radius of the intersecting circle on the intersecting plane
+	// with center (x, 0)
+	double h1 = R - x;
+	double h2 = y - h1;
+	// h1 is the height of the intersecting spherical cap of the big sphere
+	// h2 is for the small sphere
+
+	// total volume of the whole intersection = sum of the volumes of the spherical caps
+	double volume      = PI * h1 * h1 * (3 * R - h1) / 3.0 + PI * h2 * h2 * (3 * r - h2) / 3.0;
+	// total surface area of the intersecting spherical caps
+	double surface_area = 2 * PI * R * h1 + 2 * PI * r * h2;
+	return make_pair(surface_area, volume);
+}
+
+sphere smallest_enclosing_sphere(vector<p3> p) {
+	int n = p.size();
+	p3 c(0, 0, 0);
+	for(int i = 0; i < n; i++) c = c + p[i];
+	c = c / n;
+
+	double ratio = 0.1;
+	int pos = 0;
+	int it = 100000;
+	while (it--) {
+		pos = 0;
+		for (int i = 1; i < n; i++) {
+			if(sq(c - p[i]) > sq(c - p[pos])) pos = i;
+		}
+		c = c + (p[pos] - c) * ratio;
+		ratio *= 0.998;
+	}
+	return sphere(c, abs(c - p[pos]));
+}
+
+
+struct pyramid {
+	int n;     // number of sides of the pyramid
+	double l;  // length of each side
+	double ang;
+	pyramid(int _n, double _l) {
+		n = _n;
+		l = _l;
+		ang = PI / n;
+	}
+	double base_area() {
+		return l * l * n / (4 * tan(ang));
+	}
+	double height() {
+		return l * sqrt(1 - 1 / (4 * sin(ang) * sin(ang)) );
+	}
+	double volume() {
+		return base_area() * height() / 3;
+	}
+};
 
 int32_t main() {
 	ios_base::sync_with_stdio(0);

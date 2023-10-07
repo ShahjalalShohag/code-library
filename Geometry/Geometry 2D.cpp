@@ -1,6 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
+// https://victorlecomte.com/cp-geo.pdf
 const int N = 3e5 + 9;
 
 const double inf = 1e100;
@@ -32,6 +33,8 @@ struct PT {
         return PT(x * r, y * r);
     }
 };
+istream &operator >> (istream &in, PT &p) { return in >> p.x >> p.y; }
+ostream &operator << (ostream &out, PT &p) { return out << "(" << p.x << "," << p.y << ")"; }
 inline double dot(PT a, PT b) { return a.x * b.x + a.y * b.y; }
 inline double dist2(PT a, PT b) { return dot(a - b, a - b); }
 inline double dist(PT a, PT b) { return sqrt(dot(a - b, a - b)); }
@@ -430,7 +433,8 @@ int tangents_lines_from_circle(PT c1, double r1, PT c2, double r2, bool inner, l
     if (out.size() == 2) v = line(out[1].first, out[1].second);
     return 1 + (h2 > 0);
 }
-//O(n^2 log n)
+// O(n^2 log n)
+// https://vjudge.net/problem/UVA-12056
 struct CircleUnion {
     int n;
     double x[2020], y[2020], r[2020];
@@ -692,7 +696,7 @@ int is_point_in_polygon(vector<PT> &p, const PT& z) { // O(n)
 // id of the vertex having maximum dot product with z
 // polygon must need to be convex
 // top - upper right vertex
-// for minimum dot prouct negate z and return -dot(z, p[id])
+// for minimum dot product negate z and return -dot(z, p[id])
 int extreme_vertex(vector<PT> &p, const PT &z, const int top) { // O(log n)
     int n = p.size();
     if (n == 1) return 0;
@@ -715,6 +719,7 @@ int extreme_vertex(vector<PT> &p, const PT &z, const int top) { // O(log n)
     if (dot(p[l], z) > ans) ans = dot(p[l], z), id = l;
     return id;
 }
+// maximum distance from any point on the perimeter to another point on the perimeter
 double diameter(vector<PT> &p) {
     int n = (int)p.size();
     if (n == 1) return 0;
@@ -731,6 +736,8 @@ double diameter(vector<PT> &p) {
     }
     return sqrt(ans);
 }
+// minimum distance between two parallel lines (non necessarily axis parallel)
+// such that the polygon can be put between the lines
 double width(vector<PT> &p) {
     int n = (int)p.size();
     if (n <= 2) return 0;
@@ -837,8 +844,33 @@ double polygon_line_intersection(vector<PT> p, PT a, PT b) {
     p.pop_back();
     return ans;
 }
-pair<PT, PT> convex_line_intersection(vector<PT> &p, PT a, PT b) {
-	return {{0, 0}, {0, 0}};
+// given a convex polygon p, and a line ab and the top vertex of the polygon
+// returns the intersection of the line with the polygon
+// it returns the indices of the edges of the polygon that are intersected by the line
+// so if it returns i, then the line intersects the edge (p[i], p[(i + 1) % n])
+array<int, 2> convex_line_intersection(vector<PT> &p, PT a, PT b, int top) {
+	int end_a = extreme_vertex(p, (a - b).perp(), top);
+    int end_b = extreme_vertex(p, (b - a).perp(), top);
+    auto cmp_l = [&](int i) { return orientation(a, p[i], b); };
+    if (cmp_l(end_a) < 0 || cmp_l(end_b) > 0)
+        return {-1, -1}; // no intersection
+    array<int, 2> res;
+    for (int i = 0; i < 2; i++) {
+        int lo = end_b, hi = end_a, n = p.size();
+        while ((lo + 1) % n != hi) {
+            int m = ((lo + hi + (lo < hi ? 0 : n)) / 2) % n;
+            (cmp_l(m) == cmp_l(end_b) ? lo : hi) = m;
+        }
+        res[i] = (lo + !cmp_l(hi)) % n;
+        swap(end_a, end_b);
+    }
+    if (res[0] == res[1]) return {res[0], -1}; // touches the vertex res[0]
+    if (!cmp_l(res[0]) && !cmp_l(res[1])) 
+        switch ((res[0] - res[1] + (int)p.size() + 1) % p.size()) {
+            case 0: return {res[0], res[0]}; // touches the edge (res[0], res[0] + 1)
+            case 2: return {res[1], res[1]}; // touches the edge (res[1], res[1] + 1)
+        }
+    return res; // intersects the edges (res[0], res[0] + 1) and (res[1], res[1] + 1)
 }
 
 pair<PT, int> point_poly_tangent(vector<PT> &p, PT Q, int dir, int l, int r) {
@@ -1046,24 +1078,32 @@ vector<PT> half_plane_intersection(vector<HP> h) {
     }
     return hull;
 }
-// a and b are strictly convex polygons of DISTINCT points
-// returns a convex hull of their minkowski sum with distinct points
-vector<PT> minkowski_sum(vector<PT> &a, vector<PT> &b) {
-    int n = (int)a.size(), m = (int)b.size();
-    int i = 0, j = 0; //assuming a[i] and b[j] both are (left, bottom)-most points
-    vector<PT> c;
+// rotate the polygon such that the (bottom, left)-most point is at the first position
+void reorder_polygon(vector<PT> &p) {
+  int pos = 0;
+  for (int i = 1; i < p.size(); i++) {
+    if (p[i].y < p[pos].y || (sign(p[i].y - p[pos].y) == 0 && p[i].x < p[pos].x)) pos = i;
+  }
+  rotate(p.begin(), p.begin() + pos, p.end());
+}
+// a and b are convex polygons
+// returns a convex hull of their minkowski sum
+// min(a.size(), b.size()) >= 2
+// https://cp-algorithms.com/geometry/minkowski.html
+vector<PT> minkowski_sum(vector<PT> a, vector<PT> b) {
+  reorder_polygon(a); reorder_polygon(b);
+  int n = a.size(), m = b.size();
+  int i = 0, j = 0;
+  a.push_back(a[0]); a.push_back(a[1]);
+  b.push_back(b[0]); b.push_back(b[1]);
+  vector<PT> c;
+  while (i < n || j < m) {
     c.push_back(a[i] + b[j]);
-    while (1) {
-        PT p1 = a[i] + b[(j + 1) % m];
-        PT p2 = a[(i + 1) % n] + b[j];
-        int t = orientation(c.back(), p1, p2);
-        if (t >= 0) j = (j + 1) % m;
-        if (t <= 0) i = (i + 1) % n, p1 = p2;
-        if (t == 0) p1 = a[i] + b[j];
-        if (p1 == c[0]) break;
-        c.push_back(p1);
-    }
-    return c;
+    double p = cross(a[i + 1] - a[i], b[j + 1] - b[j]);
+    if (sign(p) >= 0) ++i;
+    if (sign(p) <= 0) ++j;
+  }
+  return c;
 }
 // system should be translated from circle center
 double triangle_circle_intersection(PT c, double r, PT a, PT b) {
@@ -1177,6 +1217,33 @@ double maximum_inscribed_circle(vector<PT> p) {
 		else r = mid;
 	}
 	return l;
+}
+// ear decomposition, O(n^3) but faster
+vector<vector<PT>> triangulate(vector<PT> p) {
+  vector<vector<PT>> v;
+  while (p.size() >= 3) {
+    for (int i = 0, n = p.size(); i < n; i++) {
+      int pre = i == 0 ? n - 1 : i - 1;;
+      int nxt = i == n - 1 ? 0 : i + 1;;
+      int ori = orientation(p[i], p[pre], p[nxt]);
+      if (ori < 0) {
+        int ok = 1;
+        for (int j = 0; j < n; j++) {
+          if (j == i || j == pre || j == nxt)continue;
+          if (is_point_in_triangle(p[i], p[pre], p[nxt] , p[j]) < 1) {
+            ok = 0;
+            break;
+          }
+        }
+        if (ok) {
+          v.push_back({p[pre], p[i], p[nxt]});
+          p.erase(p.begin() + i);
+          break;
+        }
+      }
+    }
+  }
+  return v;
 }
 int32_t main() {
   	ios_base::sync_with_stdio(0);

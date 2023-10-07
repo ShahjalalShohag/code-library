@@ -754,6 +754,16 @@ sphere smallest_enclosing_sphere(vector<p3> p) {
 	return sphere(c, abs(c - p[pos]));
 }
 
+// it returns the angle of the spherical cap that is formed by the intersection of all tangents
+double tangent_from_point_to_sphere(p3 p, sphere s) {
+    double d = abs(p - s.c);
+    if (sign(d - s.r) < 0) return -1; // inside the sphere, so no tangent
+    if (sign(d - s.r) == 0) return -2; // on the sphere, handle separately
+    double tangent_length = sqrt(d * d - s.r * s.r);
+    double th = acos(s.r / d);
+    return th;
+}
+
 
 struct pyramid {
 	int n;     // number of sides of the pyramid
@@ -773,6 +783,34 @@ struct pyramid {
 	double volume() {
 		return base_area() * height() / 3;
 	}
+};
+
+struct cylinder {
+    double r, h; // radius and height
+    cylinder(double _r, double _h) {
+        r = _r;
+        h = _h;
+    }
+    double volume() {
+        return PI * r * r * h;
+    }
+    double surface_area() {
+        return 2 * PI * r * h + 2 * PI * r * r;
+    }
+};
+
+struct cone {
+    double r, h; // radius and height
+    cone(double _r, double _h) {
+        r = _r;
+        h = _h;
+    }
+    double volume() {
+        return PI * r * r * h / 3.0;
+    }
+    double surface_area() {
+        return PI * r * (r + sqrt(h * h + r * r));
+    }
 };
 
 int32_t main() {

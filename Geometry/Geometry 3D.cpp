@@ -115,6 +115,17 @@ struct plane {
     p3 proj(p3 p) { return p - n * side(p) / sq(n); }
     // orthogonal reflection of point p onto plane
     p3 refl(p3 p) { return p - n * 2 * side(p) / sq(n); }
+    pair<p3, p3> get_two_points_on_plane() {
+        assert(sign(n.x) != 0 || sign(n.y) != 0 || sign(n.z) != 0);
+        if (sign(n.x) == 0 && sign(n.y) == 0) return {p3(1, 0, d/n.z),  p3(0, 1, d/n.z)};
+        if (sign(n.y) == 0 && sign(n.z) == 0) return {p3(d/n.x, 1, 0),  p3(d/n.x, 0, 1)};
+        if (sign(n.z) == 0 && sign(n.x) == 0) return {p3(1, d/n.y, 0),  p3(0, d/n.y, 1)};
+        if (sign(n.x) == 0) return {p3(1, d/n.y, 0),  p3(0, 0, d/n.z)};
+        if (sign(n.y) == 0) return {p3(0, 1, d/n.z),  p3(d/n.x, 0, 0)};
+        if (sign(n.z) == 0) return {p3(d/n.x, 0, 1),  p3(0, d/n.y, 0)};
+        if (sign(d)!=0) return {p3(d/n.x, 0, 0),  p3(0, d/n.y, 0)};
+        return {p3(n.y, -n.x, 0),  p3(-n.y, n.x, 0)};
+    }
 };
 
 struct coords {
@@ -132,7 +143,7 @@ struct coords {
     // it allows us to keep using integer coordinates but has some pitfalls
     // e.g. distances and angles are not preserved but relative positions are (convex hull works)
     coords(p3 p, p3 q, p3 r, p3 s) :
-		o(p), dx(q - p), dy(r - p), dz(s - p) {}
+                o(p), dx(q - p), dy(r - p), dz(s - p) {}
     // 2D position vector of point p in this coordinate system centered at o
     // p must be on the plane
     PT pos2d(p3 p) {
@@ -252,8 +263,8 @@ double distance_from_segment_to_point(p3 a, p3 b, p3 c) {
     return fabs(cross((b - a).unit(), c - a).abs());
 }
 double distance_from_triangle_to_point(p3 a, p3 b, p3 c, p3 d) {
-  	plane P(a, b, c);
-  	p3 proj = P.proj(d);
+        plane P(a, b, c);
+        p3 proj = P.proj(d);
     double dis = min(distance_from_segment_to_point(a, b, d), min(distance_from_segment_to_point(b, c, d), distance_from_segment_to_point(c, a, d)));
     int o = sign(orient_by_normal(a, b, proj, P.n));
     int inside = o == sign(orient_by_normal(b, c, proj, P.n));
@@ -305,13 +316,13 @@ struct edge {
 // just compute the area vector of one face to see if it’s pointing outwards or inwards
 vector<vector<p3>> reorient(vector<vector<p3>> fs) {
     int n = fs.size();
-	// Find the common edges and create the resulting graph
+        // Find the common edges and create the resulting graph
     vector<vector<edge>> g(n);
     map<pair<p3,p3>, int> es;
     for (int u = 0; u < n; u++) {
         for (int i = 0, m = fs[u].size(); i < m; i++) {
             p3 a = fs[u][i], b = fs[u][(i + 1) % m];
-			// Let’s look at edge a-b
+                        // Let’s look at edge a-b
             if (es.count({a, b})) { // seen in same order
                 int v = es[{a, b}];
                 g[u].push_back({v, true});
@@ -327,7 +338,7 @@ vector<vector<p3>> reorient(vector<vector<p3>> fs) {
             }
         }
     }
-	// Perform BFS to find which faces should be flipped
+        // Perform BFS to find which faces should be flipped
     vector<bool> vis(n,false), flip(n);
     flip[0] = false;
     queue<int> q;
@@ -338,14 +349,14 @@ vector<vector<p3>> reorient(vector<vector<p3>> fs) {
         for (edge e : g[u]) {
             if (!vis[e.v]) {
                 vis[e.v] = true;
-				// If the edge was in the same order,
-				// exactly one of the two should be flipped
+                                // If the edge was in the same order,
+                                // exactly one of the two should be flipped
                 flip[e.v] = (flip[u] ^ e.same);
                 q.push(e.v);
             }
         }
     }
-	// Actually perform the flips
+        // Actually perform the flips
     for (int u = 0; u < n; u++)
         if (flip[u]) {
             reverse(fs[u].begin(), fs[u].end());
@@ -366,10 +377,10 @@ struct CH3D {
     vector<vector<int>> g;
 
     void init(vector<p3> p) {
-    	P = p;
-    	n = p.size();
-    	F.resize(8 * n + 1);
-    	g.resize(n + 1, vector<int> (n + 1));
+        P = p;
+        n = p.size();
+        F.resize(8 * n + 1);
+        g.resize(n + 1, vector<int> (n + 1));
     }
 
     double len(p3 a) {
@@ -643,62 +654,62 @@ int winding_number_3D(vector<vector<p3>> fs) {
     for (vector<p3> f : fs) {
         sum += remainder(area_on_the_surface_of_the_sphere(1, f), 4 * PI);
     }
-   	return round(sum / (4 * PI));
+    return round(sum / (4 * PI));
 }
 
 struct sphere {
-	p3 c;
-	double r;
-	sphere() {}
-	sphere(p3 c, double r) : c(c), r(r) {}
+    p3 c;
+    double r;
+    sphere() {}
+    sphere(p3 c, double r) : c(c), r(r) {}
 };
 
 // spherical cap is a portion of a sphere cut off by a plane
 // https://en.wikipedia.org/wiki/Spherical_cap
 struct spherical_cap {
-	p3 c;
-	double r;
-	spherical_cap() {}
-	spherical_cap(p3 c, double r) : c(c), r(r) {}
+    p3 c;
+    double r;
+    spherical_cap() {}
+    spherical_cap(p3 c, double r) : c(c), r(r) {}
 
-	// angle th is the polar angle between the rays from the center of the sphere to one edge of the cap
-	// and orthogonal line from the center of the sphere to the plane of the cap
+    // angle th is the polar angle between the rays from the center of the sphere to one edge of the cap
+    // and orthogonal line from the center of the sphere to the plane of the cap
 
-	// height of the cap (just like real world cap)
-	double height(double th)      {
-		return r * (1 - cos(th));
-	}
-	// radius of the base of the cap
-	double base_radius(double th)  {
-		return r * sin(th);
-	}
-	// volume of the cap
-	double volume(double th)      {
-		double h = height(th);
-		return PI * h * h * (3 * r - h) / 3.0;
-	}
-	// surface area of the cap
-	double surface_area(double th) {
-		double h = height(th);
-		return 2 * PI * r * h;
-	}
+    // height of the cap (just like real world cap)
+    double height(double th)      {
+        return r * (1 - cos(th));
+    }
+    // radius of the base of the cap
+    double base_radius(double th)  {
+        return r * sin(th);
+    }
+    // volume of the cap
+    double volume(double th)      {
+        double h = height(th);
+        return PI * h * h * (3 * r - h) / 3.0;
+    }
+    // surface area of the cap
+    double surface_area(double th) {
+        double h = height(th);
+        return 2 * PI * r * h;
+    }
 };
 
 // returns the sphere passing through four points
 sphere circumscribed_sphere(p3 a, p3 b, p3 c, p3 d) {
-	assert( sign(plane(a, b, c).side(d)) != 0);
+    assert( sign(plane(a, b, c).side(d)) != 0);
 
-	plane u = plane(a - b, (a + b) / 2);
-	plane v = plane(b - c, (b + c) / 2);
-	plane w = plane(c - d, (c + d) / 2);
+    plane u = plane(a - b, (a + b) / 2);
+    plane v = plane(b - c, (b + c) / 2);
+    plane w = plane(c - d, (c + d) / 2);
 
-	assert(!is_parallel(u, v));
-	assert(!is_parallel(v, w));
-	line3d l1(u, v), l2(v, w);
-	assert( sign(dist(l1, l2)) == 0);
+    assert(!is_parallel(u, v));
+    assert(!is_parallel(v, w));
+    line3d l1(u, v), l2(v, w);
+    assert( sign(dist(l1, l2)) == 0);
 
-	p3 C = closest_on_l1(l1, l2);
-	return sphere(C, abs(C - a));
+    p3 C = closest_on_l1(l1, l2);
+    return sphere(C, abs(C - a));
 }
 
 // https://mathworld.wolfram.com/Sphere-SphereIntersection.html
@@ -706,52 +717,52 @@ sphere circumscribed_sphere(p3 a, p3 b, p3 c, p3 d) {
 // handle that case separately
 // returns the surface area and volume of the intersection
 pair<double, double> sphere_sphere_intersection(sphere s1, sphere s2) {
-	double d = abs(s1.c - s2.c);
-	if(sign(d - s1.r - s2.r) >= 0) return {0, 0}; // not intersecting
-	// only the distance matters, so we will now consider the centers
-	// of the big sphere to be (0, 0, 0) and (d, 0, 0) for the small sphere
-	// we can transform the results back to w.r.t the real centers if we want
+    double d = abs(s1.c - s2.c);
+    if(sign(d - s1.r - s2.r) >= 0) return {0, 0}; // not intersecting
+    // only the distance matters, so we will now consider the centers
+    // of the big sphere to be (0, 0, 0) and (d, 0, 0) for the small sphere
+    // we can transform the results back to w.r.t the real centers if we want
 
-	double R = max(s1.r, s2.r);
-	double r = min(s1.r, s2.r);
-	double y = R + r - d;
-	double x = (R * R - r * r + d * d) / (2 * d);
-	// the intersecting plane is parallel to the yz plane
-	// with the above x value as its x coordinate
-	double w = d * d - r * r  + R * R;
-	double a = sqrt(4 * d * d * R * R - w * w) / (2.0 * d);
-	// a is the radius of the intersecting circle on the intersecting plane
-	// with center (x, 0)
-	double h1 = R - x;
-	double h2 = y - h1;
-	// h1 is the height of the intersecting spherical cap of the big sphere
-	// h2 is for the small sphere
+    double R = max(s1.r, s2.r);
+    double r = min(s1.r, s2.r);
+    double y = R + r - d;
+    double x = (R * R - r * r + d * d) / (2 * d);
+    // the intersecting plane is parallel to the yz plane
+    // with the above x value as its x coordinate
+    double w = d * d - r * r  + R * R;
+    double a = sqrt(4 * d * d * R * R - w * w) / (2.0 * d);
+    // a is the radius of the intersecting circle on the intersecting plane
+    // with center (x, 0)
+    double h1 = R - x;
+    double h2 = y - h1;
+    // h1 is the height of the intersecting spherical cap of the big sphere
+    // h2 is for the small sphere
 
-	// total volume of the whole intersection = sum of the volumes of the spherical caps
-	double volume      = PI * h1 * h1 * (3 * R - h1) / 3.0 + PI * h2 * h2 * (3 * r - h2) / 3.0;
-	// total surface area of the intersecting spherical caps
-	double surface_area = 2 * PI * R * h1 + 2 * PI * r * h2;
-	return make_pair(surface_area, volume);
+    // total volume of the whole intersection = sum of the volumes of the spherical caps
+    double volume      = PI * h1 * h1 * (3 * R - h1) / 3.0 + PI * h2 * h2 * (3 * r - h2) / 3.0;
+    // total surface area of the intersecting spherical caps
+    double surface_area = 2 * PI * R * h1 + 2 * PI * r * h2;
+    return make_pair(surface_area, volume);
 }
 
 sphere smallest_enclosing_sphere(vector<p3> p) {
-	int n = p.size();
-	p3 c(0, 0, 0);
-	for(int i = 0; i < n; i++) c = c + p[i];
-	c = c / n;
+    int n = p.size();
+    p3 c(0, 0, 0);
+    for(int i = 0; i < n; i++) c = c + p[i];
+    c = c / n;
 
-	double ratio = 0.1;
-	int pos = 0;
-	int it = 100000;
-	while (it--) {
-		pos = 0;
-		for (int i = 1; i < n; i++) {
-			if(sq(c - p[i]) > sq(c - p[pos])) pos = i;
-		}
-		c = c + (p[pos] - c) * ratio;
-		ratio *= 0.998;
-	}
-	return sphere(c, abs(c - p[pos]));
+    double ratio = 0.1;
+    int pos = 0;
+    int it = 100000;
+    while (it--) {
+        pos = 0;
+        for (int i = 1; i < n; i++) {
+            if(sq(c - p[i]) > sq(c - p[pos])) pos = i;
+        }
+        c = c + (p[pos] - c) * ratio;
+        ratio *= 0.998;
+    }
+    return sphere(c, abs(c - p[pos]));
 }
 
 // it returns the angle of the spherical cap that is formed by the intersection of all tangents
@@ -766,23 +777,23 @@ double tangent_from_point_to_sphere(p3 p, sphere s) {
 
 
 struct pyramid {
-	int n;     // number of sides of the pyramid
-	double l;  // length of each side
-	double ang;
-	pyramid(int _n, double _l) {
-		n = _n;
-		l = _l;
-		ang = PI / n;
-	}
-	double base_area() {
-		return l * l * n / (4 * tan(ang));
-	}
-	double height() {
-		return l * sqrt(1 - 1 / (4 * sin(ang) * sin(ang)) );
-	}
-	double volume() {
-		return base_area() * height() / 3;
-	}
+        int n;     // number of sides of the pyramid
+        double l;  // length of each side
+        double ang;
+        pyramid(int _n, double _l) {
+            n = _n;
+            l = _l;
+            ang = PI / n;
+        }
+        double base_area() {
+            return l * l * n / (4 * tan(ang));
+        }
+        double height() {
+            return l * sqrt(1 - 1 / (4 * sin(ang) * sin(ang)) );
+        }
+        double volume() {
+            return base_area() * height() / 3;
+        }
 };
 
 struct cylinder {
@@ -814,16 +825,8 @@ struct cone {
 };
 
 int32_t main() {
-	ios_base::sync_with_stdio(0);
-	cin.tie(0);
-	int n; 
-    while (cin >> n) {
-        vector<p3> p(n);
-        for (int i = 0; i < n; i++) p[i].scan();
-        CH3D hull;
-    	hull.init(p);
-    	hull.create_hull();
-    	cout << hull.number_of_polygons() << '\n';
-    }
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+        
     return 0;
 }

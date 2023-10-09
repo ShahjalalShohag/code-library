@@ -817,6 +817,7 @@ vector<PT> cut(vector<PT> &p, PT a, PT b) {
 }
 // not necessarily convex, boundary is included in the intersection
 // returns total intersected length
+// it returns the sum of the lengths of the portions of the line that are inside the polygon
 double polygon_line_intersection(vector<PT> p, PT a, PT b) {
     int n = p.size();
     p.push_back(p[0]);
@@ -824,8 +825,8 @@ double polygon_line_intersection(vector<PT> p, PT a, PT b) {
     double ans = 0.0;
     vector< pair<double, int> > vec;
     for (int i = 0; i < n; i++) {
-        int s1 = sign(cross(b - a, p[i] - a));
-        int s2 = sign(cross(b - a, p[i+1] - a));
+        int s1 = orientation(a, b, p[i]);
+        int s2 = orientation(a, b, p[i + 1]);
         if (s1 == s2) continue;
         line t = line(p[i], p[i + 1]);
         PT inter = (t.v * l.c - l.v * t.c) / cross(l.v, t.v);
@@ -833,12 +834,13 @@ double polygon_line_intersection(vector<PT> p, PT a, PT b) {
         int f;
         if (s1 > s2) f = s1 && s2 ? 2 : 1;
         else f = s1 && s2 ? -2 : -1;
-        vec.push_back(make_pair(tmp, f));
+        vec.push_back(make_pair((f > 0 ? tmp - eps : tmp + eps), f)); // keep eps very small like 1e-12
     }
     sort(vec.begin(), vec.end());
     for (int i = 0, j = 0; i + 1 < (int)vec.size(); i++){
         j += vec[i].second;
-        if (j) ans += vec[i + 1].first - vec[i].first;
+        if (j) ans += vec[i + 1].first - vec[i].first; // if this portion is inside the polygon
+        // else ans = 0; // if we want the maximum intersected length which is totally inside the polygon, uncomment this and take the maximum of ans
     }
     ans = ans / sqrt(dot(l.v, l.v));
     p.pop_back();

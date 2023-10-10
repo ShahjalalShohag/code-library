@@ -282,6 +282,7 @@ struct circle {
         r = dist(a, p);
     }
     // inscribed circle of a triangle
+    // pass a bool just to differentiate from circumcircle
     circle(PT a, PT b, PT c, bool t) {
         line u, v;
         double m = atan2(b.y - a.y, b.x - a.x), n = atan2(c.y - a.y, c.x - a.x);
@@ -387,6 +388,23 @@ int get_circle(line u, PT q, double r1, circle &c1, circle &c2) {
     }
     c2 = circle(p2, r1);
     return 2;
+}
+// returns the circle such that for all points w on the circumference of the circle
+// dist(w, a) : dist(w, b) = rp : rq
+// https://en.wikipedia.org/wiki/Circles_of_Apollonius
+circle get_apollonius_circle(PT p, PT q, double rp, double rq ){
+    rq *= rq ;
+    rp *= rp ;
+    double a = rq - rp ;
+    assert(sign(a));
+    double g = rq * p.x - rp * q.x ; g /= a ;
+    double h = rq * p.y - rp * q.y ; h /= a ;
+    double c = rq * p.x * p.x - rp * q.x * q.x+rq * p.y * p.y - rp * q.y * q.y ;
+    c /= a ;
+    PT o(g, h);
+    double r = g * g +h * h - c ;
+    r = sqrt(r);
+    return circle(o,r);
 }
 // returns area of intersection between two circles
 double circle_circle_area(PT a, double r1, PT b, double r2) {
@@ -1107,8 +1125,9 @@ vector<PT> minkowski_sum(vector<PT> a, vector<PT> b) {
   }
   return c;
 }
-// system should be translated from circle center
-double triangle_circle_intersection(PT c, double r, PT a, PT b) {
+// returns the area of the intersection of the circle with center c and radius r
+// and the triangle formed by the points c, a, b
+double _triangle_circle_intersection(PT c, double r, PT a, PT b) {
     double sd1 = dist2(c, a), sd2 = dist2(c, b);
     if(sd1 > sd2) swap(a, b), swap(sd1, sd2);
     double sd = dist2(a, b);
@@ -1148,7 +1167,7 @@ double polygon_circle_intersection(vector<PT> &v, PT p, double r) {
     for(int i = 0; i < n; i++) {
         int x = orientation(p, v[i], v[(i + 1) % n]);
         if(x == 0) continue;
-        double area = triangle_circle_intersection(org, r, v[i] - p, v[(i + 1) % n] - p);
+        double area = _triangle_circle_intersection(org, r, v[i] - p, v[(i + 1) % n] - p);
         if (x < 0) ans -= area;
         else ans += area;
     }

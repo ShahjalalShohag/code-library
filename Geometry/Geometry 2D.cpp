@@ -103,7 +103,7 @@ struct line {
 		}
 		return {p, q};
     	}
-    //ax + by + c = 0
+    //ax + by = c
     array<double, 3> get_abc() {
         double a = -v.y, b = v.x;
         return {a, b, c};

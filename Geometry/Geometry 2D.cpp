@@ -103,10 +103,10 @@ struct line {
 		}
 		return {p, q};
     	}
-    //ax + by + c = 0
+    // ax + by + c = 0
     array<double, 3> get_abc() {
         double a = -v.y, b = v.x;
-        return {a, b, c};
+        return {a, b, -c};
     }
     // 1 if on the left, -1 if on the right, 0 if on the line
     int side(PT p) { return sign(cross(v, p) - c); }

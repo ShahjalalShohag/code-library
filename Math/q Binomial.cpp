@@ -73,41 +73,62 @@ template <int32_t MOD> ostream & operator << (ostream & out, modint<MOD> n) { re
 
 using mint = modint<mod>;
 
-
+// The code is mainly implemented for q = 2
+// But I have commented out some ideas for general q
 
 mint pw[N];
 mint q_fac[N], q_inv_fac[N];
+int q = 2;
+
+// [n] = (q^n - 1) / (q - 1)
+// [n]! = [1] * [2] ... [n]
 
 void prec() {
   pw[0] = 1;
   for (int i = 1; i < N; i++) {
-    pw[i] = pw[i - 1] * 2; // q = 2
+    pw[i] = pw[i - 1] * q;
   }
-  q_fac[0] = q_fac[1] = 1;
-  for (int i = 2; i < N; i++) {
-    mint cur = (pw[i] - 1); // also, divide by (q - 1) = (2 - 1) = 1
+  q_fac[0] = 1;
+  mint inv = mint(q - 1).inv();
+  for (int i = 1; i < N; i++) {
+    mint cur = (pw[i] - 1) * inv;
     q_fac[i] = q_fac[i - 1] * cur;
   }
   q_inv_fac[N - 1] = q_fac[N - 1].inv();
   for (int i = N - 2; i >= 0; i--) {
-    q_inv_fac[i] = q_inv_fac[i + 1] * (pw[i + 1] - 1);
+    q_inv_fac[i] = q_inv_fac[i + 1] * (pw[i + 1] - 1) * inv;
   }
 }
 
 // number of r dimensional subspaces of n dimensional vector space
+// [n]! / ([r]! * [n - r]!)
 mint q_binom(int n, int r) {
   if (n < r) return 0;
   return q_fac[n] * q_inv_fac[r] * q_inv_fac[n - r];
 }
 
+// [n]! / [n - r]!
 mint q_perm(int n, int r) {
   if (n < r) return 0;
   return q_fac[n] * q_inv_fac[n - r];
 }
 
+// number of ways to select k linearly independant vectors of length n
+// mul(q^n - q^i) over 0 <= i < k
+mint yo(int n, int k) {
+  return q_perm(n, k) * mint(q).pow(1LL * k * (k - 1) / 2) * mint(q - 1).pow(k);
+}
+
+// ways to select k vectors of length n having basis size r
+mint count_basis_general(int k, int n, int r) {
+  return yo(k, r) * q_binom(n, r);
+  // same as yo(n, r) * q_binom(k, r)
+}
+
 // number of length n sequences with elements in [0, 2^k) such that its basis has size r
+// same as the above function
 mint count_basis(int n, int k, int r) {
-  return q_binom(n, r) * q_perm(k, r) * mint(2).pow(1LL * r * (r - 1) / 2);
+  return q_binom(n, r) * q_perm(k, r) * mint(q).pow(1LL * r * (r - 1) / 2) * mint(q - 1).pow(r);
 }
 
 // number of length n sequences with elements in [0, 2^k) such that no subset has xor 0
@@ -115,10 +136,11 @@ mint count_basis(int n, int k, int r) {
 // = \prod_{i=0}^{n-1}{(2^k-2^i)}
 mint count_except_xor_0(int n, int k) {
   if (n > k) return 0;
-  return q_perm(k, n) * mint(2).pow(1LL * n * (n - 1) / 2);
+  return q_perm(k, n) * mint(q).pow(1LL * n * (n - 1) / 2) * mint(q - 1).pow(n);
 }
 
 // number of length n sequences with elements in [0, 2^k) such that no subset has xor 1 and its basis has size r
+// not sure for general q, maybe also multiply with (q - 1)^(r + 1) ?
 mint count_rank_r_except_xor_1(int n, int k, int r) {
   if (r >= k) return 0;
   return q_binom(n, r) * q_perm(k - 1, r) * mint(2).pow(1LL * r * (r + 1) / 2);
@@ -178,3 +200,4 @@ int32_t main() {
 }
 // https://codeforces.com/problemset/problem/1603/F
 // https://atcoder.jp/contests/abc278/editorial/5238
+// https://www.cnblogs.com/rainybunny/p/16475568.html

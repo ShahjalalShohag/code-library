@@ -53,7 +53,7 @@ vector<int> st_numbering(int n, int s, int t) {
   T = 0;
   preorder.clear();
   for(int i = 1; i <= n; i++) dis[i] = low[i] = -1, sign[i] = 0;
-  if(!dfs1(t)) return vector<int>(); // no bipolar orientation
+  if(!dfs1(t)) return vector<int>(); // no bipolar orientation if it is not 2-vertex connected after adding the s-t edge
   for(int i = 1; i <= n; i++) if(dis[i] == -1) return vector<int>(); // no bipolar orientation
   for(int i = 1; i <= n; i++) dis[i] = low[i] = -1, sign[i] = 0;
   T = 0;
@@ -92,3 +92,4 @@ int32_t main() {
   cout << endl;
   return 0;
 }
+// one problem: https://codeforces.com/contest/1916/problem/F

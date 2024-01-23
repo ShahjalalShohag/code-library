@@ -51,8 +51,8 @@ int32_t main() {
       string w;
       stringstream ss(s);
       while (ss >> w) {
-        if (w == "or") w = "|";
-        if (w == "and") w = "&";
+        if (w == "or") w = "||";
+        if (w == "and") w = "&&";
         v.push_back(w);
       }
       for (int i = 0; i < v.size(); i++) {

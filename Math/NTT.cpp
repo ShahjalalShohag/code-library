@@ -42,6 +42,7 @@ vector<int> multiply(vector<int> &f, vector<int> &g) {
   ntt(a, 1), ntt(b, 1);
   for (int i = 0; i < lim; ++i) a[i] = (long long) a[i] * b[i] % mod;
   ntt(a, 0);
+  a.resize(n);
   //while((int)a.size() && a.back() == 0) a.pop_back();
   return a;
 }

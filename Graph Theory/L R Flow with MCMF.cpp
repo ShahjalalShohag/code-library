@@ -61,6 +61,9 @@ struct MCMF {
         for (int i = 0; i < n; i++) {
             if (d[i] < inf) d[i] += (potential[i] - potential[s]);
         }
+        for (int i = 0; i < n; i++) {
+            if (d[i] < inf) potential[i] = d[i];
+        }
         // return d[t] != inf; // for max flow min cost
         return d[t] <= 0; // for min cost flow
     }

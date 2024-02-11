@@ -83,7 +83,8 @@ struct MCMF {
             // run Bellman-Ford to find starting potential
             d.assign(n, inf);
             d[s] = 0;
-            for (int i = 0, relax; i < n && relax; i++) {
+            bool relax = true;
+            for (int i = 0; i < n && relax; i++) {
                 relax = false;
                 for (int u = 0; u < n; u++) {
                     for (int k = 0; k < (int)g[u].size(); k++) {

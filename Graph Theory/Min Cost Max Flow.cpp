@@ -44,7 +44,7 @@ struct MCMF {
     g[v].push_back(e.size());
     e.push_back(edge(v, u, 0, -cost, -1));
     mxid = max(mxid, id);
-    if(!directed) add_edge(v, u, cap, cost, id + N, true); // tracks the reverse edges for undirected graphs
+    if(!directed) add_edge(v, u, cap, cost, -1, true);
   }
   bool dijkstra() {
     par.assign(n, -1);
@@ -69,10 +69,14 @@ struct MCMF {
         }
       }
     }
-    for (int i = 0; i < n; i++) { // update potential
-      if(d[i] < inf) potential[i] += d[i];
+    for (int i = 0; i < n; i++) {
+      if (d[i] < inf) d[i] += (potential[i] - potential[s]);
     }
-    return d[t] != inf;
+    for (int i = 0; i < n; i++) {
+      if (d[i] < inf) potential[i] = d[i];
+    }
+    return d[t] != inf; // for max flow min cost
+    // return d[t] <= 0; // for min cost flow
   }
   T send_flow(int v, T cur) {
     if(par[v] == -1) return cur;
@@ -92,9 +96,15 @@ struct MCMF {
     flow = 0, cost = 0;
     potential.assign(n, 0);
     if (neg) {
-      // run Bellman-Ford to find starting potential
+      // Run Bellman-Ford to find starting potential on the starting graph
+      // If the starting graph (before pushing flow in the residual graph) is a DAG, 
+      // then this can be calculated in O(V + E) using DP:
+      // potential(v) = min({potential[u] + cost[u][v]}) for each u -> v and potential[s] = 0
       d.assign(n, inf);
-      for (int i = 0, relax = true; i < n && relax; i++) {
+      d[s] = 0;
+      bool relax = true;
+      for (int i = 0; i < n && relax; i++) {
+        relax = false;
         for (int u = 0; u < n; u++) {
           for (int k = 0; k < (int)g[u].size(); k++) {
             int id = g[u][k];

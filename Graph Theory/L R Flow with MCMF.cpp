@@ -58,8 +58,11 @@ struct MCMF {
                 }
             }
         }
+        for (int i = 0; i < n; i++) {
+            if (d[i] < inf) d[i] += (potential[i] - potential[s]);
+        }
         // return d[t] != inf; // for max flow
-        return d[t] != inf and d[t] - potential[s] + potential[t] <= 0; // for min cost
+        return d[t] <= 0; // for min cost
     }
     T send_flow(int v, T cur) {
         if(par[v] == -1) return cur;

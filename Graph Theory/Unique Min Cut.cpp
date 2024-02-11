@@ -82,11 +82,11 @@ void dfs1(int u) {
     }
   }
 }
-void dfs2(int u) {
-  if (vis[u]) return;
-  vis[u] = 1;
-  for (auto e : F.g[u]) {
-    if (abs(e.flow) < F.g[e.to][e.rev].w) {
+void dfs2(int v) {
+  if (vis[v]) return;
+  vis[v] = 1;
+  for (auto e : F.g[v]) {
+    if (F.g[e.to][e.rev].flow < F.g[e.to][e.rev].w) {
       dfs2(e.to);
     }
   }

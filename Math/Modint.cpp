@@ -1,3 +1,8 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+const int mod = 1e9 + 7;
+
 template <const int32_t MOD>
 struct modint {
   int32_t value;
@@ -25,3 +30,15 @@ template <int32_t MOD> istream & operator >> (istream & in, modint<MOD> &n) { re
 template <int32_t MOD> ostream & operator << (ostream & out, modint<MOD> n) { return out << n.value; }
 
 using mint = modint<mod>;
+
+int32_t main() {
+  ios_base::sync_with_stdio(0);
+  cin.tie(0);
+  int n = 100;
+  mint factorial = 1;
+  for (int i = 1; i <= n; i++) {
+    factorial *= i;
+  }
+  cout << factorial << '\n';
+  return 0;
+}

@@ -3,6 +3,7 @@ using namespace std;
 
 const int N = 1e5 + 9;
 
+// ignore the FFT part starting from now
 const double PI = acos(-1);
 struct base {
   double a, b;
@@ -52,6 +53,7 @@ vector<long long> multiply(vector<int> &a, vector<int> &b) {
   while((int)ret.size() > 1 && ret.back() == 0) ret.pop_back();
   return ret;
 }
+// ignore the FFT part ending here
 
 vector<int> g[N];
 int sz[N];

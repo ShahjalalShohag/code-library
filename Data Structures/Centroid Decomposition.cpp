@@ -66,3 +66,4 @@ int main() {
   for(int i = 1; i <= n; i++) cout << char(dep[i] + 'A') << ' ';
   return 0;
 }
+// https://codeforces.com/contest/321/problem/C

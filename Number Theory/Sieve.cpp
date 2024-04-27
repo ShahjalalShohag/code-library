@@ -48,7 +48,9 @@ void sieve() {
 int32_t main() {
   ios_base::sync_with_stdio(0);
   cin.tie(0);
-  // sieve_v0();
+  sieve_v0();
+  cout << primes.size() << '\n';
+  primes.clear();
   sieve();
   cout << primes.size() << '\n';
   return 0;

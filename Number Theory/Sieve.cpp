@@ -6,7 +6,7 @@ const int N = 1e6 + 9;
 vector<int> primes;
 bool is_prime[N]; 
 // use bitset<N> is_prime; to have O(N/64) memory complexity
-// using bitset you can solve upto around N = 10^8
+// using bitset you can solve upto around N = 10^8 in 1s
 void sieve_v0() {
   for (int i = 2; i < N; i++) {
     is_prime[i] = true;

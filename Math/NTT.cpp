@@ -1,7 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-const int N = 1 << 18;
+const int N = 1 << 20;
 const int mod = 998244353;
 const int root = 3;
 int lim, rev[N], w[N], wn[N], inv_lim;
@@ -43,64 +43,21 @@ vector<int> multiply(vector<int> &f, vector<int> &g) {
   for (int i = 0; i < lim; ++i) a[i] = (long long) a[i] * b[i] % mod;
   ntt(a, 0);
   a.resize(n + 1);
-  //while((int)a.size() && a.back() == 0) a.pop_back();
   return a;
 }
-int fact[N], ifact[N];
-vector<int> shift(vector<int> &f, int c) { //f(x + c)
-  int n=(int)f.size();
-  precompute(n + n - 1);
-  vector<int> a = f; a.resize(lim);
-  for (int i = 0; i < n; ++i) a[i] = (long long) a[i] * fact[i] % mod;
-  reverse(a.begin(), a.begin()+n);
-  vector<int> b; b.resize(lim); b[0] = 1;
-  for (int i = 1; i < n; ++i) b[i] = (long long) b[i - 1] * c % mod;
-  for (int i = 0; i < n; ++i) b[i] = (long long) b[i] * ifact[i] % mod;
-  ntt(a, 1), ntt(b, 1);
-  for (int i = 0; i < lim; ++i) a[i] = (long long) a[i] * b[i] % mod;
-  ntt(a, 0), reverse(a.begin(), a.begin() + n);
-  vector<int> g; g.resize(n);
-  for (int i = 0; i < n; ++i) g[i] = (long long) a[i] * ifact[i] % mod;
-  return g;
-}
-vector<int> range_mul(int n) { //(x+1)*(x+2)*(x+3)...(x+n)
-  if (n == 0) return vector<int>({1});
-  if (n & 1) {
-    vector<int> f = range_mul(n - 1);
-    f.push_back(0);
-    for (int i = (int)f.size()-1; i; --i) f[i] = (f[i - 1] + (long long) n * f[i]) % mod;
-    f[0] = (long long) f[0] * n % mod;
-    return f;
-  }
-  else {
-    int n_ = n >> 1;
-    vector<int> f = range_mul(n_);
-    vector<int> tmp = shift(f, n_);
-    f.resize(n_ + 1);
-    tmp.resize(n_ + 1);
-    return multiply(f, tmp);
-  }
-}
-int f(int n, int k) {
-  if(n == 0 && k == 0) return 1;
-  if(n <= 0 || k <= 0) return 0;
-  vector<int> x = vector<int>({0, 1});
-  vector<int> y = range_mul(n - 1);
-  vector<int> ans = multiply(x, y);
-  if(k >= (int)ans.size()) return 0;
-  return ans[k];
-}
-int ncr(int n, int r) {
-  if(r < 0 || n < r) return 0;
-  return 1LL * fact[n] * ifact[r] % mod * ifact[n - r] % mod;
-}
 int main() {
-  fact[0] = 1;
-  for (int i = 1; i < N; ++i) fact[i] = (long long) fact[i - 1] * i % mod;
-  ifact[N - 1] = POW(fact[N - 1], mod - 2);
-  for (int i = N - 1; i; --i) ifact[i - 1] = (long long) ifact[i] * i % mod;
-  int n, a, b; cin >> n >> a >> b;
-  cout << 1LL * f(n - 1, a + b - 2) * ncr(a + b - 2, a - 1) % mod << '\n';
+  ios_base::sync_with_stdio(0);
+  cin.tie(0);
+  int n, m; cin >> n >> m;
+  vector<int> a(n), b(m);
+  for (int i = 0; i < n; i++) {
+    cin >> a[i];
+  }
+  for (int i = 0; i < m; i++) {
+    cin >> b[i];
+  }
+  auto ans = multiply(a, b);
+  ans.resize(n + m - 1);
+  for (auto x: ans) cout << x << ' '; cout << '\n';
   return 0;
 }
-//https://codeforces.com/problemset/problem/960/G

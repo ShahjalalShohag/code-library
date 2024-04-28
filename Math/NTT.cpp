@@ -61,3 +61,4 @@ int main() {
   for (auto x: ans) cout << x << ' '; cout << '\n';
   return 0;
 }
+// https://judge.yosupo.jp/problem/convolution_mod

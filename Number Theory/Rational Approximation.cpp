@@ -40,4 +40,4 @@ int32_t main() {
   }
   return 0;
 }
-// https://official.contest.yandex.ru/opencupXVIII/contest/5457/problems/E/?success=51368253#7/2017_10_14/fqGQVSrCf7
+// https://official.contest.yandex.ru/opencupXVIII/contest/5457/problems/E?lang=en

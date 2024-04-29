@@ -26,3 +26,4 @@ int32_t main() {
   }
   return 0;
 }
+// https://en.wikipedia.org/wiki/Pythagorean_triple#Generating_a_triple

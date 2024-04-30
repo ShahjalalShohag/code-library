@@ -67,26 +67,20 @@ struct Mat {
 int32_t main() {
   ios_base::sync_with_stdio(0);
   cin.tie(0);
-  int n, m, k; cin >> n >> m >> k;
-  Mat a(n, m);
+  int n, k; cin >> n >> k;
+  Mat a(n, n);
   for (int i = 0; i < n; i++) {
-    for (int j = 0; j < m; j++) {
+    for (int j = 0; j < n; j++) {
       cin >> a.a[i][j];
     }
   } 
-  Mat b(m, k);
-  for (int i = 0; i < m; i++) {
-    for (int j = 0; j < k; j++) {
-      cin >> b.a[i][j];
-    }
-  }
-  Mat ans = a * b;
+  Mat ans = a.pow(k);
   for (int i = 0; i < n; i++) {
-    for (int j = 0; j < k; j++) {
+    for (int j = 0; j < n; j++) {
       cout << ans.a[i][j] << ' ';
     }
     cout << '\n';
   }
   return 0;
 }
-// https://judge.yosupo.jp/problem/matrix_product
+// https://judge.yosupo.jp/problem/pow_of_matrix

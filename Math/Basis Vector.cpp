@@ -1,46 +1,50 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-const int N = 3e5 + 9;
-
 struct Basis {
-  vector<int> a;
-  void insert(int x) {
-    for (auto &i: a) x = min(x, x ^ i);
-    if (!x) return;
-    for (auto &i: a) if ((i ^ x) < i) i ^= x;
-    a.push_back(x);
-    sort(a.begin(), a.end());
+  static const int B = 30;
+  int a[B];
+  Basis() {
+    memset(a, 0, sizeof a);
+  }
+  void insert(int x){
+    for (int i = B - 1; i >= 0; i--) {
+      if (x >> i & 1) {
+        if (a[i]) x ^= a[i];
+        else {
+          a[i] = x;
+          break;
+        }
+      }
+    }
   }
   bool can(int x) {
-    for (auto &i: a) x = min(x, x ^ i);
-    return !x;
+    for(int i = B - 1; i >= 0; i--) {
+      x = min(x, x ^ a[i]);
+    }
+    return x == 0;
   }
-  int maxxor(int x = 0) {
-    for (auto &i: a) x = max(x, x ^ i);
-    return x;
-  } 
-  int minxor(int x = 0) {
-    for (auto &i: a) x = min(x, x ^ i);
-    return x;
-  }
-  int kth(int k) { // 1st is 0
-    int sz = (int)a.size();
-    if (k > (1LL << sz)) return -1;
-    k--; int ans = 0;
-    for (int i = 0; i < sz; i++) if (k >> i & 1) ans ^= a[i];
+  int max_xor(int ans = 0) {
+    for(int i = B - 1; i >= 0; i--) {
+      ans = max(ans, ans ^ a[i]);
+    }
     return ans;
   }
-}t;
-int main() {
+};
+
+int32_t main() {
   ios_base::sync_with_stdio(0);
   cin.tie(0);
-  int q; cin >> q;
-  while (q--) {
-    int ty, k; cin >> ty >> k;
-    if (ty == 1) t.insert(k);
-    else cout << t.kth(k) << '\n';
+  int t, cs = 0; cin >> t;
+  while (t--) {
+    int n; cin >> n;
+    Basis B;
+    for (int i = 1; i <= n; i++) {
+      int x; cin >> x;
+      B.insert(x);
+    }
+    cout << "Case " << ++cs << ": " << B.max_xor() << '\n';
   }
   return 0;
 }
-//https://codeforces.com/group/qcIqFPYhVr/contest/203881/problem/S
+// https://lightoj.com/problem/maximum-subset-sum

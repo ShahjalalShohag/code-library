@@ -49,7 +49,7 @@ int main() {
     sort(mp + 1, mp + m + 1);
     m = unique(mp + 1, mp + m + 1) - mp - 1;
     upd(1, 1, m, all[0].ymin, all[0].ymax, all[0].ty);
-    long long ans = 0 ;
+    long long ans = 0 ; // sum of area covered by odd number of rectangles
     for (int i = 1; i < n; i++) {
         ans += 1LL * t[1] * (all[i].x - all[i - 1].x);
         upd(1, 1, m, all[i].ymin, all[i].ymax, all[i].ty);

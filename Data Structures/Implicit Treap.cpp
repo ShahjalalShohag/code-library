@@ -166,7 +166,7 @@ struct treap {
     lazy_sum_upd(t);
     int idx = add + size(t->l);
     if(t->l) t->l->par = NULL;
-		if(t->r) t->r->par = NULL; 
+    if(t->r) t->r->par = NULL; 
     if(idx <= k)
       split(t->r, t->r, r, k, idx + 1), l = t;
     else

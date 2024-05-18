@@ -29,6 +29,7 @@ struct AhoCorasick {
     while (!q.empty()) {
       int u = q.front();
       q.pop();
+      // caution: change 2 to 26 for normal strings
       for (int c = 0; c < 2; c++) {
         int v = to[u][c];
         if (!v) continue;

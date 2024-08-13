@@ -429,6 +429,7 @@ struct BigInt {
   }
   BigInt mul_fft(const BigInt& v) const {
     BigInt res;
+    res.sgn = sgn * v.sgn;
     convolution(convert_base(a, DIG, FDIG), convert_base(v.a, DIG, FDIG), res.a);
     res.a = convert_base(res.a, FDIG, DIG);
     res.trim();

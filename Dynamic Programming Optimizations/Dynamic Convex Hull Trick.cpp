@@ -37,7 +37,7 @@ struct CHT : public multiset<line> {
   }
   void add(ll m, ll b) {
     auto y = insert({ m, b });
-    y->succ = [ = ] { return next(y) == end() ? 0 : &*next(y); };
+    y->succ = [=, this] { return next(y) == end() ? 0 : &*next(y); };
     if (bad(y)) {
       erase(y);
       return;

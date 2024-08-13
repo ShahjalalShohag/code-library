@@ -33,7 +33,7 @@ pair<ll, ll> intersect(ll a1, ll d1, ll a2, ll d2) {
   ll a = x.first, d = x.second;
   if (d == -1) return {0, 0}; // empty
   ll st = max(a1, a2);
-  a = st % d == a ? st : st - st % d + a;
+  a = a < st ? a + ((st - a + d - 1) / d) : a; // while (a < st) a += d;
   return {a, d};
 }
 int32_t main() {

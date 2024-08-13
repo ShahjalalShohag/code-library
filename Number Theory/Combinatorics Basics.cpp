@@ -6,7 +6,7 @@ template <const int32_t MOD>
 struct modint {
   int32_t value;
   modint() = default;
-  modint(int32_t value_) : value(value_) {}
+  modint(int32_t value_) : value(value_) {} // make sure value is less than MOD
   inline modint<MOD> operator + (modint<MOD> other) const { int32_t c = this->value + other.value; return modint<MOD>(c >= MOD ? c - MOD : c); }
   inline modint<MOD> operator - (modint<MOD> other) const { int32_t c = this->value - other.value; return modint<MOD>(c <    0 ? c + MOD : c); }
   inline modint<MOD> operator * (modint<MOD> other) const { int32_t c = (int64_t)this->value * other.value % MOD; return modint<MOD>(c < 0 ? c + MOD : c); }

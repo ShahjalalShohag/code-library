@@ -2,7 +2,7 @@
 using namespace std;
 
 #define ll long long
-const int N = 4010;
+const int N = 4010, inf = 1e9;
 
 int sc() {
 	int c = getchar();
@@ -29,7 +29,7 @@ int cost(int i, int j) {
 void yo(int i, int l, int r, int optl, int optr) {
 	if(l > r) return;
 	int mid = (l + r) / 2;
-	dp[i][mid] = 2e9; // for maximum cost change it to 0
+	dp[i][mid] = inf; // for maximum cost change it to 0
 	int opt = -1;
 	for(int k = optl; k <= min(mid - 1, optr); k++) {
 		int c = dp[i - 1][k] + cost(k + 1, mid);
@@ -65,6 +65,11 @@ int main() {
 			c[i][j] = a[i][j] + c[i - 1][j] + c[i][j - 1] - c[i - 1][j - 1];
 		}
 	}
+  for(i = 1; i <= k; i++) {
+    for (j = 1; j <= n; j++) {
+      dp[i][j] = inf;
+    }
+  }
 	for(i = 1; i <= n; i++) dp[1][i] = cost(1, i);
 	for(i = 2; i <= k; i++) yo(i, 1, n, 1, n);
 	cout << dp[k][n] / 2 << endl;

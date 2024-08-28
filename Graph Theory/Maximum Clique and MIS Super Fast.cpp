@@ -4,7 +4,7 @@ using namespace std;
 /**
  * Credit: kactl
  * Given a graph as a symmetric bitset matrix (without any self edges)
- * Finds the maximum matching
+ * Finds the maximum clique
  * Can be used to find the maximum independent set by finding a clique of the complement graph.
  * Runs in about 1s for n=155, and faster for sparse graphs
  * 0 indexed

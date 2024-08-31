@@ -48,53 +48,60 @@ vector<int> zeta_transform_for_supermasks(vector<int> f) {
   }
   return f;
 }
-// f*g(s)=sum_{s' $ s} {f(s')*g(s\s')}
+// f*g(s)=sum_{s' $ s} {F(s')*G(s\s')}
 // O(B * B * 2 ^ B)
-vector<int> subset_sum_convolution(vector<int> f, vector<int> g) {
-  vector< vector<int> > fhat(B + 1, vector<int> (1 << B, 0));
-  vector< vector<int> > ghat(B + 1, vector<int> (1 << B, 0));
-  // Make fhat[][] = {0} and ghat[][] = {0}
+vector<int> subset_sum_convolution(vector<int> F, vector<int> G) {
+  vector<vector<int>> f(B + 1, vector<int> (1 << B, 0));
+  vector<vector<int>> g(B + 1, vector<int> (1 << B, 0));
+
   for (int mask = 0; mask < (1 << B); mask++) {
-    fhat[__builtin_popcount(mask)][mask] = f[mask];
-    ghat[__builtin_popcount(mask)][mask] = g[mask];
+    f[__builtin_popcount(mask)][mask] = F[mask];
+    g[__builtin_popcount(mask)][mask] = G[mask];
   }
-  // Apply zeta transform on fhat[][] and ghat[][]
-  for (int i = 0; i <= B; i++) {
-    for (int j = 0; j <= B; j++) {
-      for (int mask = 0; mask < (1 << B); mask++) {
-        if ((mask & (1 << j)) != 0) {
-          fhat[i][mask] += fhat[i][mask ^ (1 << j)];
-          if (fhat[i][mask] >= mod) fhat[i][mask] -= mod;
-          ghat[i][mask] += ghat[i][mask ^ (1 << j)];
-          if (ghat[i][mask] >= mod) ghat[i][mask] -= mod;
-        }
-      }
-    }
-  }
-  vector< vector<int> > h(B + 1, vector<int> (1 << B, 0));
-  // Do the convolution and store into h[][] = {0}
-  for (int mask = 0; mask < (1 << B); mask++) {
+
+  for (int k = 0; k <= B; k++) {
+    // do SOS -> f[k][mask] will be = number of submasks of mask such that |submask| = k 
+    // same for g[k][mask]
     for (int i = 0; i <= B; i++) {
-      for (int j = 0; j <= i; j++) {
-        h[i][mask] += 1LL * fhat[j][mask] * ghat[i - j][mask] % mod;
-        if (h[i][mask] >= mod) h[i][mask] -= mod;
-      }
-    }
-  }
-  // Apply inverse SOS dp on h[][]
-  for (int i = 0; i <= B; i++) {
-    for (int j = 0; j <= B; j++) {
       for (int mask = 0; mask < (1 << B); mask++) {
-        if ((mask & (1 << j)) != 0) {
-          h[i][mask] -= h[i][mask ^ (1 << j)];
-          if (h[i][mask] < 0) h[i][mask] += mod;
+        if (mask >> i & 1) {
+          f[k][mask] += f[k][mask ^ (1 << i)];
+          if (f[k][mask] >= mod) f[k][mask] -= mod;
+          g[k][mask] += g[k][mask ^ (1 << i)];
+          if (g[k][mask] >= mod) g[k][mask] -= mod;
         }
       }
     }
   }
-  vector<int> fog(1 << B, 0);
-  for (int mask = 0; mask < (1 << B); mask++)  fog[mask] = h[__builtin_popcount(mask)][mask];
-  return fog;
+
+  vector<vector<int>> h(B + 1, vector<int> (1 << B, 0));
+  // h[k][mask] = number of pairs (u, v) such that u belongs to F
+  // and v belongs to G and (u | v) is a submask of mask and |u| + |v| = k
+  for (int mask = 0; mask < (1 << B); mask++) {
+    for (int k = 0; k <= B; k++) {
+      for (int i = 0; i <= k; i++) {
+        h[k][mask] += 1LL * f[i][mask] * g[k - i][mask] % mod;
+        if (h[k][mask] >= mod) h[k][mask] -= mod;
+      }
+    }
+  }
+
+  for (int k = 0; k <= B; k++) {
+    // do inverse SOS -> h[k][mask] will be = same as above but now (u | v) = mask
+    for (int i = 0; i <= B; i++) {
+      for (int mask = 0; mask < (1 << B); mask++) {
+        if (mask >> i & 1) {
+          h[k][mask] -= h[k][mask ^ (1 << i)];
+          if (h[k][mask] < 0) h[k][mask] += mod;
+        }
+      }
+    }
+  }
+
+  // and, when u | v = mask and |u| + |v| = |mask|, that means u & v = 0 and we are done!
+  vector<int> ans(1 << B, 0);
+  for (int mask = 0; mask < (1 << B); mask++)  ans[mask] = h[__builtin_popcount(mask)][mask];
+  return ans;
 }
 };
 

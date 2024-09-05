@@ -30,6 +30,7 @@ struct LCT {
   void pull(int x) {
     if (!x) return;
     int &l = t[x].c[0], &r = t[x].c[1];
+    push(l); push(r);
     t[x].sum = t[l].sum + t[r].sum + t[x].val;
     t[x].sz = t[l].sz + t[r].sz + 1;
     t[x].ssz = t[l].ssz + t[r].ssz + t[x].vsz + 1;

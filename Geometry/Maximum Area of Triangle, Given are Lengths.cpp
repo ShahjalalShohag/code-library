@@ -30,7 +30,7 @@ int32_t main() {
     int a = 1;
     // triples are (a, b, c) (a < b < c)
     for (int d = 1; d * 2 <= m; d++) { // fix the difference between b and c
-      while (a <= d or !f[a]) ++a; // find the first a > c
+      while (a <= d or !f[a]) ++a; // find the first a > d
       auto g = f & (f >> d);
       int b = g._Find_next(a); // find the first b > a s.t. b and b + d is in the array
       if (b <= m) {

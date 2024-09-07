@@ -21,7 +21,7 @@ using ll = long long;
  * - Find suitable g() and fast prefix sum of g()
  * - Calculate h(p^k) using the method described in the blog, generally its like this:
  *   => Expand f(p^k) = sum_{i = 0 to k}{g(p^(k-i)) * h(p^i)}
- *   => Separate the h(p^k) term and gets its recurrence relation 
+ *   => Separate the h(p^k) term and get its recurrence relation 
  *   => Then subtract equations from h(p^k) to h(p^(k-1))
  * - Finally brute over all powerful numbers and get the result
  * 

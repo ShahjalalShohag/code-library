@@ -5,6 +5,8 @@ const int N = 3e5 + 9;
 
 using ll = long long;
 
+// credit: unknown
+
 int mod_inv(int a, int mod) {
   int b = mod, s = 1, t = 0, old_a = a;
   while (b) {

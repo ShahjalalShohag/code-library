@@ -6,7 +6,7 @@ using ll = long long;
 
 
 /**
- * Tutotorial: https://oi-wiki.org/math/number-theory/powerful-number/
+ * Tutorial: https://oi-wiki.org/math/number-theory/powerful-number/
  * - f() is multiplicative, need to find prefix sum of f
  * - Consider two functions g() and h() such that f = g [*] h (dirichlet convolution)
  * - So f(n) = sum_{d | n}{g(d) * h(n / d)}

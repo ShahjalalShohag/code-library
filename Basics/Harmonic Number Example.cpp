@@ -10,7 +10,7 @@ int32_t main() {
   // total complexity of the following two loops = O(n logn)
   // because the number of times the loops are running 
   // = n / 1 + n / 2 + ... + n / n
-  // = n * (1 / 2 + 1 / 2 + ... + 1 / n)
+  // = n * (1 / 1 + 1 / 2 + ... + 1 / n)
   // = n * H(n) [here H(n) is nth Harmonic number]
   // = O(n * log(n)) because H(n) is around O(log n)
   for (int i = 1; i < N; i++) {

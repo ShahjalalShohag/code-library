@@ -35,7 +35,9 @@ void ntt(vector<int> &a, int typ) {
   }
 }
 vector<int> multiply(vector<int> &f, vector<int> &g) {
-  int n=(int)f.size() + (int)g.size() - 1;
+  if (f.empty() or g.empty()) return {};
+  int n = (int)f.size() + (int)g.size() - 1;
+  if (n == 1) return {(int)((long long) f[0] * g[0] % mod)};
   precompute(n);
   vector<int> a = f, b = g;
   a.resize(lim); b.resize(lim);

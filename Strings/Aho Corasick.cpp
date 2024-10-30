@@ -54,7 +54,7 @@ struct AC {
 
 // Problem:  You are given n patterns (sum of the lengths of which is sum <= 10^5), and also a text string s. 
 // Find the minimum number of substring partitions that we can have of the text string such that each partition exists in the given patterns.
-// This codes solves it in O(len(s) * sqrt(sum)) by utilizing the fact that at most O(sqrt(sum)) distinct sqrt(sum) can end at a specific index of s
+// This code solves it in O(len(s) * sqrt(sum)) by utilizing the fact that at most O(sqrt(sum)) distinct patterns can end at a specific index of s
 // And using out_link it becomes trivial to brute force over all such patterns
 int32_t main() {
   ios_base::sync_with_stdio(0);

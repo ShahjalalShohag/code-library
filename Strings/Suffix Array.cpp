@@ -80,7 +80,7 @@ vector<int> SA_IS(const vector<int> &vec, int val_range) {
 vector<int> suffix_array(const string &s, const int LIM = 128) {
   vector<int> vec(s.size() + 1);
   copy(begin(s), end(s), begin(vec));
-  vec.back() = '$';
+  vec.back() = '!';
   auto ret = SA_IS(vec, LIM);
   ret.erase(ret.begin());
   return ret;

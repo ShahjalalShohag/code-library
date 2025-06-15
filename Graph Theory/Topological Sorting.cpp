@@ -36,7 +36,8 @@ int32_t main() {
   }
   for (int u = 1; u <= n; u++) {
     for (auto v: g[u]) {
-      if (pos[u] > pos[v]) {
+      // We need to consider self loops too!
+      if (pos[u] >= pos[v]) { 
         cout << "IMPOSSIBLE\n";
         return 0;
       }

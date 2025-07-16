@@ -60,9 +60,8 @@ int main() {
         for (auto p: primes) {
             cout << p << '\n';
         }
-        if (t > 0) cout << '\n';
     }
     return 0;
 }
 
-// https://www.spoj.com/problems/PRIME1/
+// https://www.spoj.com/problems/PRINT/

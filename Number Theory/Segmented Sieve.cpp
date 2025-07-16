@@ -19,6 +19,7 @@ vector<int> generatePrimesUpTo(int limit) {
     }
     return primes;
 }
+// Generate all primes from m to n
 void segmentedSieve(int m, int n) {
     if (m == 1) {
         m++;

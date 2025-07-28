@@ -6,7 +6,7 @@ const int N = 1e6 + 9;
 vector<pair<int, int>> ans[N]; //ans[c] = {{a, b}}, s.t. a^2 + b^2 = c^2
 int32_t main() {
   vector<pair<int, int>> v;
-  int cnt = 0, p = 0;
+  int cnt = 0;
   for (int m = 1; m * m < N; m++) {
     for (int n = 1; n < m; n++) {
       if ((n & 1) == (m & 1)) continue;

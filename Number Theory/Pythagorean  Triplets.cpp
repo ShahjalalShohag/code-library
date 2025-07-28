@@ -12,13 +12,13 @@ int32_t main() {
       if ((n & 1) == (m & 1)) continue;
       int a = m * m - n * n, b = 2 * m * n, c = m * m + n * n;
       if (__gcd(a, b) > 1) continue;
-      for (int k = 1; k * c < N && k <= 1 ; k++) {
+      for (int k = 1; k * c < N; k++) { // use only k = 1 to generate only primitive triples 
         ans[c * k].emplace_back(a * k, b * k);
         cnt++;
       }
     }
   }
-  int sz = 0;
+  // int sz = 0;
   // for (int i = 1; i < N; i++) sz = max(sz, (int)ans[i].size());
   // cout << cnt << ' ' << sz << '\n';
   for (int i = 1; i <= 1000; i++) {

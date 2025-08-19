@@ -7,7 +7,15 @@
 
 ## Topic List (For this Library, Must Check)
 
-The topic lists for which I have created this library can be found [here](https://youkn0wwho.academy/topic-list). It also contains the relevant problems and tutorials for each topic. Also, you can track your progress there.
+The topic lists for which I have created this library can be found here:
+
+<div align="center">
+
+[![📚 The Ultimate Topic List](https://img.shields.io/badge/📚_The_Ultimate_Topic_List-Visit_Now-blue?style=for-the-badge&logo=academia)](https://youkn0wwho.academy/topic-list)
+
+</div>
+
+It also contains the relevant problems and tutorials for each topic. Also, you can track your progress there.
 
 ## Code Library
 
